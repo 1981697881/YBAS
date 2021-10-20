@@ -15,7 +15,7 @@
 			</input-box>
 			<view class="flex">
 				<input-box class="flex-sub" label="联系人"><input type="text" v-model="contactData.contactName" /></input-box>
-				<input-box class="flex-sub" label="电话"><input type="text" v-model="contactData.contactPhone" /></input-box>
+				<input-box class="flex-sub" label="电话"><input type="text" v-model="contactData.contactPhone" /><button v-if="!userInfo.phoneNumber" class="cu-btn round lines-red" open-type="getPhoneNumber" @getphonenumber="bindPhone">获取</button></input-box>
 			</view>
 			<input-box label="邮寄地址">
 				<input type="text" v-model="contactData.contactAddr" />
@@ -71,7 +71,7 @@
 </template>
 
 <script>
-
+import { mapMutations, mapActions, mapState } from 'vuex';
 import mock from '@/common/mock/register';
 export default {
 	components: {
@@ -107,6 +107,9 @@ export default {
 		};
 	},
 	computed:{
+		...mapState({
+			userInfo: state => state.user.userInfo,
+		}),
 		// 当前选择的第n个产品数据
 		proData: function(){
 			return this.formData[this.currentPage]
@@ -131,12 +134,31 @@ export default {
 		// 将副本字段引用到表单data中
 		// 需要深拷贝，不然.push = 引用this.formDataCopy
 		this.formData.push(JSON.parse(JSON.stringify(this.formDataCopy)))
+		this.contactData.contactName = this.userInfo.username;
+		 this.contactData.contactPhone = this.userInfo.phoneNumber;
 	},
 	mounted: function() {
 		// 自动生成单号
 		this.getFixCode();
 	},
 	methods: {
+		...mapActions(['getUserDetails']),
+		bindPhone(e) {
+			console.log(e)
+			let me = this;
+			me.$api('user.getWxMiniPhoneNumber', {
+				sessionKey: uni.getStorageSync('session_key'),
+				openid: uni.getStorageSync('openid'),
+				encryptedData: e.detail.encryptedData,
+				iv: e.detail.iv
+			}).then(res => {
+				if (res.flag) {
+					me.getUserDetails();
+					/* uni.setStorageSync('phone', res.data);
+					me.jump('/pages/user/edit-phone', { fromType: 'bind', phone: res.data }); */
+				}
+			});
+		},
 		// 选择文件后触发 - 支持多选
 		select(e, action) {
 			// tempFiles - Array[Files]

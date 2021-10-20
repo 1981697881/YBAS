@@ -112,12 +112,14 @@
 			<repair-form ref="repair-form" />
 			<template slot="footer">
 				<view class="flex">
-					<text class="flex-sub share-footer text-white bg-blue cuIcon-add" @click="$refs['repair-form'].addformData">追加产品</text>
+					<text class="flex-sub share-footer text-white bg-blue cuIcon-add" @tap="add">追加产品</text>
 					<view class="flex-sub share-footer text-blue" @click="submit">提交</view>
 				</view>
 			</template>
 		</custom-share>
 		<!-- 登记界面的弹出层end -->
+		<!-- 登录提示 -->
+		<app-login-modal></app-login-modal>		
 	</view>
 </template>
 
@@ -164,10 +166,17 @@ export default {
 	mounted() {
 	},
 	methods: {
+		add(){
+			let that = this;
+			that.$nextTick(function(){
+				that.$refs['repair-form'].addformData();
+			})
+		},
 		// 该维修单是否已支付，传入当前维修单的data；0 未支付。1 已支付
 		isPayStatus: item => item.payStatus == 1,
 		// 登记界面的表单提交
 		submit() {
+			let that = this;
 			// 获取表单data，rules
 			const { formData, formRules, contactData } = this.$refs['repair-form'];
 			console.log(formData);
@@ -199,8 +208,13 @@ export default {
 					}
 				}
 			}
+			that.$api('afterSale.repairDetailAdd', formData).then(res => {
+				if (res.flag) {
+					
+				}
+			});
 			showToast('提交成功');
-			this.shareStatus = false;
+			that.shareStatus = false;
 		},
 		// 支付维修费用
 		doPay(item) {

@@ -152,6 +152,7 @@ export default {
 		// 切换tab页
 		handletab(index) {
 			this.tabCurrent = index;
+			this.init();
 		},
 		// 路由跳转
 		jump(path, params) {
@@ -176,8 +177,15 @@ export default {
 			// 停止当前页面下拉刷新。
 			uni.stopPullDownRefresh();
 			// 每个单号下的独立列表赋予当前选中页属性
-			this.list = mock.index.list.map(item => Object.assign(item, { page: 0 }));
 			console.log(this.currentList);
+			let that = this;
+			this.$api('afterSale.repairList', {
+				status: that.tabCurrent
+			}).then(res => {
+				if (res.flag) {
+					this.list = res.data.map(item => Object.assign(item, { page: 0 }));
+				}
+			});
 		}
 	}
 };

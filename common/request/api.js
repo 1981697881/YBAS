@@ -12,23 +12,28 @@ export default {
 	/** 审批 ↓ **/
 	afterSale:{
 		repairDetailAdd:{
-			url: '/applet/repairDetail/add',
+			url: 'applet/repairDetail/add',
 			auth: true,
 			method: 'POST',
 			// desc: '报修',
+		},repairList:{
+			url: 'applet/repair/list',
+			auth: true,
+			method: 'POST',
+			// desc: '报修记录',
 		},warrantyAdd:{
-			url: '/applet/warranty/add',
+			url: 'applet/warranty/add',
 			auth: true,
 			method: 'POST',
 			// desc: '质保登记',
 		},reportAdd:{
-			url: '/applet/report/add',
+			url: 'applet/report/add',
 			auth: true,
 			method: 'POST',
 			// desc: '上报',
 		},
 		repairDetailUpdate:{
-			url: '/applet/repairDetail/update',
+			url: 'applet/repairDetail/update',
 			auth: true,
 			method: 'POST',
 			// desc: '维修',

@@ -128,6 +128,7 @@ export default {
 	methods: {
 		// 登记界面的表单提交
 		submit() {
+			let that = this;
 			// 获取表单data，rules
 			const { formData, formRules } = this.$refs['register-form'];
 			const showToast = function(value) {
@@ -153,6 +154,11 @@ export default {
 					}
 				}
 			}
+			that.$api('afterSale.warrantyAdd', formData).then(res => {
+				if (res.flag) {
+					
+				}
+			});
 			showToast('提交成功');
 			this.shareStatus = false;
 		},
