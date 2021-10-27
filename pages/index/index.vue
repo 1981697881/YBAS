@@ -121,7 +121,7 @@ export default {
 	onPullDownRefresh() {
 		this.init();
 	},
-	/* created() {
+	created() {
 		let that = this;
 		this.$api('user.findUserAuthority', {
 			openId: uni.getStorageSync('openid')
@@ -143,7 +143,7 @@ export default {
 				});
 			}
 		});
-	}, */
+	},
 	methods: {
 		// 监听分页器的变化，修改当前单号下的页数
 		handlePageChange(newPage,item) {

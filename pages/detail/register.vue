@@ -32,7 +32,7 @@
 			<view class="input-box text-blue text-center" @click="getList">查找</view>
 		</view>
 		<!-- 搜索条件end -->
-		
+
 		<!-- 列表start -->
 		<view class="list-warpper">
 			<view class="input-box" style="background: inherit;font-size:26rpx;">
@@ -73,7 +73,7 @@
 			</template>
 		</view>
 		<!-- 列表end -->
-		
+
 		<!-- 登记界面的弹出层start -->
 		<custom-share :show="shareStatus" title="新增登记" @close="handleShare" @rtClick="handleScan('edit')">
 			<template slot="footer">
@@ -82,7 +82,7 @@
 			<template slot="title-right">
 				<uni-icons type="scan" color="#808080" size="28"></uni-icons>
 			</template>
-			<register-form ref="register-form" />
+			<register-form ref="register-form" :resData="resData" />
 		</custom-share>
 		<!-- 登记界面的弹出层end -->
 	</view>
@@ -94,8 +94,7 @@ import registerForm from './components/register-form';
 
 export default {
 	components: {
-		registerForm,
-		
+		registerForm
 	},
 	data() {
 		return {
@@ -106,7 +105,7 @@ export default {
 				// 购买日期-最大日期
 				maxDate: null,
 				// 购买日期-最小日期
-				minDate: null,
+				minDate: null
 			},
 			// 查找的列表数据
 			list: [],
@@ -156,7 +155,6 @@ export default {
 			}
 			that.$api('afterSale.warrantyAdd', formData).then(res => {
 				if (res.flag) {
-					
 				}
 			});
 			showToast('提交成功');
@@ -189,43 +187,61 @@ export default {
 			this.searchData.minDate = e.target.value;
 		},
 		// 点击扫描图标
-		handleScan(action){
-			if(action === 'edit'){
-				// 在登记界面点击的扫描图标
-			} else {
-				// 默认点击列表页的扫描图标
-			}
-			console.log('点击扫描图标')
+		handleScan(action) {
+			let that = this;
+
+			uni.scanCode({
+				success: function(res) {
+					if (action === 'edit') {
+						console.log('条码类型：' + res.scanType);
+						console.log('条码内容：' + res.result);
+						let resData = res.result.split(';')
+						if(resData.length>0){
+							let obj = {}
+							obj.name = resData[2];
+							obj.model = resData[1];
+							obj.barCode = res.result;
+							that.$nextTick(function(){
+								that.$refs['register-form'].scanBarcode(obj);
+							})
+						}else{
+
+						}
+						// 在登记界面点击的扫描图标
+					} else {
+						that.searchData.barCode = res.result;
+					}
+				}
+			});
 		},
 		// 查询条件的所有输入框一键清空内容功能
 		// key 对应的v-model键名
 		// 接受数据类型'keyname' | 'keyname.keyname' | 'keyname.keyname.keyname'......
 		handleSearchClear(key) {
-			const keyArr = key.split('.')
+			const keyArr = key.split('.');
 			if (keyArr.length > 1) {
 				let data = this;
-				for(let i in keyArr){
-					const k = keyArr[i]
-					if(i*1 === keyArr.length-1){
-						data[keyArr[keyArr.length-1]] = ''
-					}else{
-						data = data[k]
+				for (let i in keyArr) {
+					const k = keyArr[i];
+					if (i * 1 === keyArr.length - 1) {
+						data[keyArr[keyArr.length - 1]] = '';
+					} else {
+						data = data[k];
 					}
-					
 				}
 			}
 		},
 		// api - 请求列表
-		getList(){
+		getList() {
 			uni.showLoading({
-				title: '查找中',
-			})
-			this.list = mock.index.list
-			console.log(this.list)
-			setTimeout(()=>{
-				uni.hideLoading()
-			},1000)
-		},
+				title: '查找中'
+			});
+			this.list = mock.index.list;
+			console.log(this.list);
+			setTimeout(() => {
+				uni.hideLoading();
+			}, 1000);
+		}
 	}
 };
 </script>

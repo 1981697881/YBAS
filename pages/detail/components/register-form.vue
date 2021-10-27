@@ -9,31 +9,41 @@
 <template>
 	<view style="padding: 32rpx 0;">
 		<input-box label="产品条码" required><input type="text" v-model="formData.barCode" placeholder="请输入或扫描产品包装盒上的条码" /></input-box>
-		<input-box label="产品名称"><input type="text" v-model="formData.name"  disabled/></input-box>
-		<input-box label="产品型号"><input type="text" v-model="formData.model"  disabled/></input-box>
+		<input-box label="产品名称"><input type="text" v-model="formData.name" disabled /></input-box>
+		<input-box label="产品型号"><input type="text" v-model="formData.model" disabled /></input-box>
 		<input-box label="购买日期" required>
 			<picker mode="date" v-model="formData.bounghtDate" @change="handleBounghtDateChange">
 				<view class="flex align-center"><input type="text" v-model="formData.bounghtDate" class="flex-sub" placeholder="请选择日期" /></view>
 			</picker>
 		</input-box>
 		<input-box label="保修期至"><input type="text" v-model="formData.expireDate" class="flex-sub" disabled placeholder="自动计算,最少一年" /></input-box>
-		<input-box label="省市"><input type="text" v-model="formData.provinceCity" placeholder="请填写省份市区" /></input-box>
+		<input-box label="省市">
+			<!-- <input type="text" v-model="formData.provinceCity" placeholder="请填写省份市区" /> -->
+			<uni-data-picker
+				placeholder="请选择地址"
+				popup-title="请选择城市"
+				collection="opendb-city-china"
+				field="code as value, name as text"
+				orderby="value asc"
+				self-field="code"
+				parent-field="parent_code"
+				@change="onchange"
+				@nodeclick="onnodeclick"
+			></uni-data-picker>
+		</input-box>
 		<input-box label="联系电话"><input type="text" v-model="formData.phone" placeholder="请输入电话或座机号码" /></input-box>
-		<input-box label="联系地址"><input type="text" v-model="formData.address"  disabled/></input-box>
+		<input-box label="联系地址"><input type="text" v-model="formData.address" placeholder="请输入联系地址" /></input-box>
 		<!-- 支持多选 -->
 		<input-box label="购买凭证" required>
-			<uni-file-picker :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg" @select="select" @delete="delFile" />
+			<uni-file-picker :auto-upload="false" :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg" @select="select" @delete="delFile" />
 		</input-box>
 	</view>
 </template>
 
 <script>
-
 import mock from '@/common/mock/register';
 export default {
-	components: {
-		
-	},
+	components: {},
 	data() {
 		return {
 			isReview: false,
@@ -71,10 +81,20 @@ export default {
 			console.log(value);
 		}
 	},
-	mounted: function() {
-		
-	},
+	mounted: function() {},
 	methods: {
+		scanBarcode(obj) {
+			this.formData.barCode = obj.barCode;
+			this.formData.name = obj.name;
+			this.formData.model = obj.model;
+		},
+		onchange(e) {
+			const value = e.detail.value;
+			console.log(value);
+		},
+		onnodeclick(node) {
+			console.log(node);
+		},
 		// 选择文件后触发 - 支持多选
 		select(e) {
 			// tempFiles - Array[Files]

@@ -9,103 +9,45 @@ export default {
 		method: 'GET',
 		// desc: '初始化数据',
 	},
-	/** 审批 ↓ **/
-	afterSale:{
-		repairDetailAdd:{
+	/** 售后 ↓ **/
+	afterSale: {
+		repairDetailAdd: {
 			url: 'applet/repairDetail/add',
 			auth: true,
 			method: 'POST',
 			// desc: '报修',
-		},repairList:{
+		},
+		repairList: {
 			url: 'applet/repair/list',
 			auth: true,
 			method: 'POST',
 			// desc: '报修记录',
-		},warrantyAdd:{
+		},
+		warrantyAdd: {
 			url: 'applet/warranty/add',
 			auth: true,
 			method: 'POST',
 			// desc: '质保登记',
-		},reportAdd:{
+		},
+		reportAdd: {
 			url: 'applet/report/add',
 			auth: true,
 			method: 'POST',
 			// desc: '上报',
 		},
-		repairDetailUpdate:{
+		repairDetailUpdate: {
 			url: 'applet/repairDetail/update',
 			auth: true,
 			method: 'POST',
 			// desc: '维修',
 		},
-		applyOrderList:{
-			url: 'applyApprovalRecord/applyApprovalOrderList',
+		seriesList: {
+			url: 'partsList/seriesList',
 			auth: true,
 			method: 'POST',
-			// desc: '获取申请列表',
+			// desc: '配件系列',
 		},
-		approvalOrderList:{
-			url: 'applyApprovalRecord/waitApplyApprovalOrderList',
-			auth: true,
-			method: 'POST',
-			// desc: '获取审批列表',
-		}, applyCcPerson:{
-			url: 'applyCcPerson/applyOrder',
-			auth: true,
-			method: 'POST',
-			// desc: '获取抄送列表',
-		}, applyApprovalOrders:{
-			url: 'applyApprovalRecord/applyApprovalOrders',
-			auth: true,
-			method: 'POST',
-			// desc: '获取已完成列表',
-		}, 
-		applyOrder:{
-			url: 'applyApprovalRecord/addApplyApprovalOrder',
-			auth: true,
-			method: 'POST',
-			// desc: '保存',
-		},
-		/* approvalOrder:{
-			url: 'approval/approvalOrder',
-			auth: true,
-			method: 'POST',
-			// desc: '提交',
-		}, */
-		orderApproval:{
-			url: 'applyApprovalRecord/approvalOrder',
-			auth: true,
-			method: 'POST',
-			// desc: '审核',
-		},
-		jinDu:{
-			url: 'applyApprovalRecord/approvalOrderJinDu',
-			auth: true,
-			method: 'POST',
-			// desc: '审核进度',
-		},
-		updateOrderApproval:{
-			url: 'approval/updateOrderApproval',
-			auth: true,
-			method: 'POST',
-			// desc: '审核完成',
-		},approvalOrderAgain:{
-			url: 'applyApprovalRecord/approvalOrderAgain',
-			auth: true,
-			method: 'POST',
-			// desc: '重新申请',
-		},
-		reimbursementType: {
-			url: 'applyApprovalRecord/reimbursementType',
-			auth: true,
-			method: 'POST',
-			// desc: '报销类型',
-		},costType: {
-			url: 'applyApprovalRecord/costType',
-			auth: true,
-			method: 'POST',
-			// desc: '费用类型',
-		},
+
 	},
 	/** 聊天 ↓ **/
 	chat: {
@@ -167,17 +109,20 @@ export default {
 			auth: true,
 			method: 'POST',
 			// desc: '用户信息',
-		},findUserAuthority: {
+		},
+		findUserAuthority: {
 			url: 'member/findUserAuthority',
 			auth: true,
 			method: 'POST',
 			// desc: ' 查询当前用户是否绑定权限职员',
-		},setUserAuthority: {
+		},
+		setUserAuthority: {
 			url: 'member/setUserAuthority',
 			auth: true,
 			method: 'POST',
 			// desc: ' 当前用户绑定权限职员',
-		},approvalPerson: {
+		},
+		approvalPerson: {
 			url: 'applyApprovalRecord/approvalPerson',
 			auth: true,
 			method: 'POST',

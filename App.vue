@@ -34,7 +34,6 @@ export default {
 							uni.setStorageSync('isAndroid', false);
 						}
 						// #endif
-
 						// #ifdef MP-WEIXIN
 						platform = 'wxMiniProgram';
 						 new Wechat().getWxMiniProgramSessionKey();
