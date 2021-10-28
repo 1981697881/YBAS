@@ -13,7 +13,7 @@
 				<!--  -->
 				<u-grid-item v-for="(item, index) in meau" :custom-style="{ padding: '0', textAlign: 'center' }" :key="index">
 					<!-- <uni-icons :type="item.icon"></uni-icons> -->
-					<view style="padding: 60rpx 0;" @click="jump(item.path)">{{ item.name }}</view>
+					<view style="padding: 60rpx 0;"><button v-if="index<4" @tap="jump(item.path)" class="cu-btn round shadow line-black">{{ item.name }}</button><button v-else open-type="contact" class="cu-btn round shadow line-black">{{ item.name }}</button></view>
 				</u-grid-item>
 			</u-grid>
 		</view>

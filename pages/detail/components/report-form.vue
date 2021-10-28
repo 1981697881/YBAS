@@ -24,7 +24,6 @@
 			</input-box>
 		</view>
 		<!-- 表单的父表end -->
-		
 		<!-- 分页器start -->
 		<view class="pagination-warpper flex">
 			<uni-icons class="flex-sub text-center" type="arrowleft" @click="handlePageChange('prev')"></uni-icons>
@@ -32,21 +31,20 @@
 			<uni-icons class="flex-sub text-center" type="arrowright" @click="handlePageChange('next')"></uni-icons>
 		</view>
 		<!-- 分页器end -->
-		
 		<!-- 表单的子表-多个start -->
 		<view class="form-warpper">
 			<input-box label="产品条码" required>
 				<view class="flex align-center">
-					<input class="flex-sub" type="text" v-model="proData.barCode" placeholder="请输入或扫描产品包装盒上的条码" :disabled="!isEdit" />
+					<input class="flex-sub" type="text" v-model="proData.productCode" placeholder="请输入或扫描产品包装盒上的条码" :disabled="!isEdit" />
 					<uni-icons v-if="isEdit" type="scan" color="#808080" @click="handleScanBarCode"></uni-icons>
 				</view>
 			</input-box>
-			<input-box label="产品名称"><input type="text" v-model="proData.name" placeholder="根据条码自动填充" disabled /></input-box>
-			<input-box label="产品型号"><input type="text" v-model="proData.model" placeholder="根据条码自动填充" disabled /></input-box>
+			<input-box label="产品名称"><input type="text" v-model="proData.productName" placeholder="根据条码自动填充" disabled /></input-box>
+			<input-box label="产品型号"><input type="text" v-model="proData.productModel" placeholder="根据条码自动填充" disabled /></input-box>
 		</view>
 		
 		<!-- 支持多选 -->
-		<input-box label="故障图片">
+		<input-box label="相关图片">
 			<uni-file-picker :disabled="!isEdit" :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg" @select="select($event, 'fault')" @delete="delFile($event, 'fault')" />
 		</input-box>
 		<!-- 表单的子表-多个end -->
@@ -69,11 +67,12 @@ export default {
 			customData: { outCode: '', inboxCode: '', imageFiles: [] },
 			// 产品表单数据源
 			formData: [],
-			// 产品表单数据源的字段副本
+			// 产品表单数据源的字段副本 
 			formDataCopy: {
-				barCode: '',
-				name: '',
-				model: ''
+				productCode: '',
+				productName: '',
+				productModel: '',
+				certificateFiles: []
 			},
 			// 当前页码数
 			currentPage: 0,
@@ -118,7 +117,7 @@ export default {
 			// 控制台查看该组件的files数据类型
 			// console.log('选择文件：', e);
 			e.tempFiles.map((item, index) => {
-				let actionData = this.customData.imageFiles;
+				let actionData = this.formDataCopy.certificateFiles;
 				// TODO 根据业务需求修改所需要的数据，以下代码目前用作前端测试用
 				actionData.push({
 					file: item.file,
@@ -130,7 +129,7 @@ export default {
 		delFile(e, action) {
 			// tempFile - Object[Files]
 			const { uuid } = e.tempFile;
-			let actionData = this.customData.imageFiles;
+			let actionData = this.formDataCopy.certificateFiles;
 			for (let i = 0; i < actionData.length; i++) {
 				// 删除对应的file
 				if (actionData[i].uuid === uuid) {

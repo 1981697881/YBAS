@@ -20,10 +20,10 @@
 			<scroll-view class="scroll-box" scroll-y enable-back-to-top scroll-with-animation @scrolltolower="loadMore">
 				<template v-for="(item, index) in list">
 					<uni-collapse :key="index">
-						<uni-collapse-item :title="'配件编码：' + item.partsCode">
+						<uni-collapse-item :title="'配件名称：' + item.partsName">
 							<view class="list-content padding-left">
-								<input-box label="配件名称">
-									<text>{{ item.partsName }}</text>
+								<input-box label="配件编码">
+									<text>{{ item.partsCode }}</text>
 								</input-box>
 								<input-box label="版本号">
 									<text>{{ item.partsEdition }}</text>

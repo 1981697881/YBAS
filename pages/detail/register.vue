@@ -5,26 +5,25 @@
 		<view class="title-warpper">
 			<view class="input-box flex">
 				<text class="input-label">产品条码</text>
-				<input type="text" v-model="searchData.barCode" class="flex-sub" placeholder="请手动输入或者扫描" />
-				<text v-if="searchData.barCode" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.barCode')"></text>
+				<input type="text" v-model="searchData.productCode" class="flex-sub" placeholder="请手动输入或者扫描" />
+				<text v-if="searchData.productCode" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.productCode')"></text>
 				<uni-icons type="scan" color="#808080" size="28" @click="handleScan"></uni-icons>
 			</view>
-
 			<view class="input-box flex">
 				<text class="input-label">购买日期</text>
 				<view class="flex-sub flex align-center">
-					<picker mode="date" :value="searchData.maxDate" @change="bindMaxDateChange">
+					<picker mode="date" :value="searchData.productStartBuyDate" @change="bindMaxDateChange">
 						<view class="flex align-center">
-							<input type="text" v-model="searchData.maxDate" class="flex-sub" placeholder="开始日期" />
+							<input type="text" v-model="searchData.productStartBuyDate" class="flex-sub" placeholder="开始日期" />
 							<!-- <text v-if="maxDate" class="text-clear text-blue">清空</text> -->
-							<text v-if="searchData.maxDate" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.maxDate')"></text>
+							<text v-if="searchData.productStartBuyDate" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.productStartBuyDate')"></text>
 						</view>
 					</picker>
-					<picker mode="date" :value="searchData.minDate" @change="bindMinDateChange">
+					<picker mode="date" :value="searchData.productEndBuyDate" @change="bindMinDateChange">
 						<view class="flex align-center">
-							<input type="text" v-model="searchData.minDate" class="flex-sub" placeholder="结束日期" />
+							<input type="text" v-model="searchData.productEndBuyDate" class="flex-sub" placeholder="结束日期" />
 							<!-- <text v-if="minDate" class="text-clear text-blue">清空</text> -->
-							<text v-if="searchData.minDate" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.minDate')"></text>
+							<text v-if="searchData.productEndBuyDate" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.productEndBuyDate')"></text>
 						</view>
 					</picker>
 				</view>
@@ -32,7 +31,6 @@
 			<view class="input-box text-blue text-center" @click="getList">查找</view>
 		</view>
 		<!-- 搜索条件end -->
-
 		<!-- 列表start -->
 		<view class="list-warpper">
 			<view class="input-box" style="background: inherit;font-size:26rpx;">
@@ -43,28 +41,28 @@
 			</template>
 			<template v-for="(item, index) in list">
 				<uni-collapse :key="index">
-					<uni-collapse-item :title="'产品条码：' + item.barCode" showDelete @delete="handleDelList(item, index)">
+					<uni-collapse-item :title="'产品名称：' + item.productName" showDelete @delete="handleDelList(item, index)">
 						<view class="list-content">
-							<input-box label="产品名称">
-								<text>{{ item.name }}</text>
+							<input-box label="产品条码">
+								<text>{{ item.productCode }}</text>
 							</input-box>
 							<input-box label="型号">
-								<text>{{ item.model }}</text>
+								<text>{{ item.productModel }}</text>
 							</input-box>
 							<input-box label="购买日期">
-								<text>{{ item.bounghtDate | formatDate }}</text>
+								<text>{{ item.productBuyDate | formatDate }}</text>
 							</input-box>
 							<input-box label="保修期至">
-								<text>{{ item.expireDate | formatDate }}</text>
+								<text>{{ item.productGuarantee | formatDate }}</text>
 							</input-box>
 							<input-box label="省市">
-								<text>{{ item.provinceCity }}</text>
+								<text>{{ item.province }}</text>
 							</input-box>
 							<input-box label="联系电话">
-								<text>{{ item.phone }}</text>
+								<text>{{ item.contactNumber }}</text>
 							</input-box>
 							<input-box label="联系地址">
-								<text>{{ item.address }}</text>
+								<text>{{ item.contactAddress }}</text>
 							</input-box>
 							<input-box label="购买凭证"><uni-file-picker v-model="item.certificateFiles" readonly /></input-box>
 						</view>
@@ -73,7 +71,6 @@
 			</template>
 		</view>
 		<!-- 列表end -->
-
 		<!-- 登记界面的弹出层start -->
 		<custom-share :show="shareStatus" title="新增登记" @close="handleShare" @rtClick="handleScan('edit')">
 			<template slot="footer">
@@ -87,7 +84,6 @@
 		<!-- 登记界面的弹出层end -->
 	</view>
 </template>
-
 <script>
 import mock from '@/common/mock/register';
 import registerForm from './components/register-form';
@@ -101,11 +97,11 @@ export default {
 			// 查找的数据集
 			searchData: {
 				// 产品条码
-				barCode: '',
+				productCode: '',
 				// 购买日期-最大日期
-				maxDate: null,
+				productStartBuyDate: null,
 				// 购买日期-最小日期
-				minDate: null
+				productEndBuyDate: null
 			},
 			// 查找的列表数据
 			list: [],
@@ -155,9 +151,11 @@ export default {
 			}
 			that.$api('afterSale.warrantyAdd', formData).then(res => {
 				if (res.flag) {
+					that.getList();
+					showToast(res.msg);
 				}
 			});
-			showToast('提交成功');
+			
 			this.shareStatus = false;
 		},
 		// 弹出层显示
@@ -209,7 +207,8 @@ export default {
 						}
 						// 在登记界面点击的扫描图标
 					} else {
-						that.searchData.barCode = res.result;
+						that.searchData.productCode = res.result;
+						that.getList();
 					}
 				}
 			});
@@ -233,14 +232,15 @@ export default {
 		},
 		// api - 请求列表
 		getList() {
-			uni.showLoading({
-				title: '查找中'
+			let that = this;
+			that.isLoading = true;
+			that.loadStatus = 'loading';
+			that.$api('afterSale.warrantyList', that.searchData).then(res => {
+				if (res.flag) {
+					that.isLoading = false;
+					that.list = [...res.data];
+				}
 			});
-			this.list = mock.index.list;
-			console.log(this.list);
-			setTimeout(() => {
-				uni.hideLoading();
-			}, 1000);
 		}
 	}
 };

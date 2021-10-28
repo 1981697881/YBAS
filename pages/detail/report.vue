@@ -150,10 +150,10 @@ export default {
 			}
 			that.$api('afterSale.reportAdd', formData).then(res => {
 				if (res.flag) {
-					
+					showToast(res.msg);
+					that.getList();
 				}
 			});
-			showToast('提交成功');
 			this.shareStatus = false;
 			this.isEdit = false;
 		},

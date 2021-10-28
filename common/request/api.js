@@ -29,6 +29,12 @@ export default {
 			method: 'POST',
 			// desc: '质保登记',
 		},
+		warrantyList: {
+			url: 'applet/warranty/List',
+			auth: true,
+			method: 'POST',
+			// desc: '质保登记列表',
+		},
 		reportAdd: {
 			url: 'applet/report/add',
 			auth: true,
