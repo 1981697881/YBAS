@@ -54,7 +54,6 @@
 			</template>
 		</view>
 		<!-- 列表end -->
-
 		<!-- 登记界面的弹出层start -->
 		<!-- 隐藏销毁 -->
 		<template v-if="shareStatus">
@@ -119,6 +118,7 @@ export default {
 	methods: {
 		// 表单提交
 		submit() {
+			let that = this;
 			// 获取表单data，rules
 			const { formData, formRules, customData } = this.$refs['report-form'];
 			const showToast = function(value) {
@@ -148,7 +148,7 @@ export default {
 					}
 				}
 			}
-			that.$api('afterSale.reportAdd', formData).then(res => {
+			that.$api('afterSale.reportAdd', {reports:formData}).then(res => {
 				if (res.flag) {
 					showToast(res.msg);
 					that.getList();

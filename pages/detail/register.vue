@@ -187,7 +187,6 @@ export default {
 		// 点击扫描图标
 		handleScan(action) {
 			let that = this;
-
 			uni.scanCode({
 				success: function(res) {
 					if (action === 'edit') {

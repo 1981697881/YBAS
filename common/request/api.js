@@ -52,6 +52,16 @@ export default {
 			auth: true,
 			method: 'POST',
 			// desc: '配件系列',
+		},scanOutPutOrder: {
+			url: 'outputOrder/scanOutPutOrder',
+			auth: true,
+			method: 'GET',
+			// desc: '出库单扫描产品',
+		},scanPackcode: {
+			url: 'outputOrder/scanPackcode',
+			auth: true,
+			method: 'GET',
+			// desc: '装箱码扫描产品',
 		},
 
 	},

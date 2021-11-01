@@ -12,42 +12,45 @@
 		<view class="address-warpper">
 			<input-box label="出库单号">
 				<view class="flex align-center">
-					<input class="flex-sub" type="text" v-model="customData.outCode" placeholder="请输入或扫描出库单号" :disabled="!isEdit" />
-					<uni-icons v-if="isEdit" type="scan" color="#808080" @click="handleScanOut"></uni-icons>
+					<input class="flex-sub" type="text" v-model="customData.retrievalOrder" placeholder="请输入或扫描出库单号" :disabled="!isEdit" />
+					<uni-icons v-if="isEdit" type="scan" color="#808080" @tap="handleScanOut"></uni-icons>
 				</view>
 			</input-box>
 			<input-box label="装箱码">
 				<view class="flex align-center">
-					<input class="flex-sub" type="text" v-model="customData.inboxCode" placeholder="请输入或扫描装箱码" :disabled="!isEdit" />
-					<uni-icons v-if="isEdit" type="scan" color="#808080" @click="handleScanInbox"></uni-icons>
+					<input class="flex-sub" type="text" v-model="customData.productPackcode" placeholder="请输入或扫描装箱码" :disabled="!isEdit" />
+					<uni-icons v-if="isEdit" type="scan" color="#808080" @tap="handleScanInbox"></uni-icons>
 				</view>
 			</input-box>
 		</view>
 		<!-- 表单的父表end -->
 		<!-- 分页器start -->
-		<view class="pagination-warpper flex">
-			<uni-icons class="flex-sub text-center" type="arrowleft" @click="handlePageChange('prev')"></uni-icons>
+		<view class="pagination-warpper flex" v-if="formData.length>0">
+			<uni-icons class="flex-sub text-center" type="arrowleft" @tap="handlePageChange('prev')"></uni-icons>
 			<text class="">{{ currentPage + 1 }}/{{ formData.length }}</text>
-			<uni-icons class="flex-sub text-center" type="arrowright" @click="handlePageChange('next')"></uni-icons>
+			<uni-icons class="flex-sub text-center" type="arrowright" @tap="handlePageChange('next')"></uni-icons>
 		</view>
 		<!-- 分页器end -->
+		<block v-for="(item, index) in formData" :key="index">
 		<!-- 表单的子表-多个start -->
-		<view class="form-warpper">
-			<input-box label="产品条码" required>
-				<view class="flex align-center">
-					<input class="flex-sub" type="text" v-model="proData.productCode" placeholder="请输入或扫描产品包装盒上的条码" :disabled="!isEdit" />
-					<uni-icons v-if="isEdit" type="scan" color="#808080" @click="handleScanBarCode"></uni-icons>
-				</view>
+			<view class="form-warpper" v-if="currentPage == index">
+				<input-box label="产品条码" required>
+					<view class="flex align-center">
+						<input class="flex-sub" type="text" v-model="item.productBarcode" placeholder="请输入或扫描产品包装盒上的条码" :disabled="!isEdit" />
+						<uni-icons v-if="isEdit" type="scan" color="#808080" @tap="handleScanBarCode"></uni-icons>
+					</view>
+				</input-box>
+				<input-box label="产品名称"><input type="text" v-model="item.productName" placeholder="根据条码自动填充" disabled /></input-box>
+				<input-box label="产品型号"><input type="text" v-model="item.productModel" placeholder="根据条码自动填充" disabled /></input-box>
+				
+			</view>
+			<!-- 支持多选 -->
+			<input-box label="相关图片" v-if="currentPage == index">
+				<uni-file-picker v-model="item.certificateFiles" :disabled="!isEdit" :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg" @select="select($event, 'fault')" @delete="delFile($event, 'fault')" />
 			</input-box>
-			<input-box label="产品名称"><input type="text" v-model="proData.productName" placeholder="根据条码自动填充" disabled /></input-box>
-			<input-box label="产品型号"><input type="text" v-model="proData.productModel" placeholder="根据条码自动填充" disabled /></input-box>
-		</view>
-		
-		<!-- 支持多选 -->
-		<input-box label="相关图片">
-			<uni-file-picker :disabled="!isEdit" :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg" @select="select($event, 'fault')" @delete="delFile($event, 'fault')" />
-		</input-box>
-		<!-- 表单的子表-多个end -->
+			<button v-if="currentPage == index" class="cu-btn round line-red shadow" @tap="delItem(index,item)">移除当前行</button>
+			<!-- 表单的子表-多个end -->
+		</block>
 	</view>
 </template>
 
@@ -64,21 +67,22 @@ export default {
 	data() {
 		return {
 			// 联系信息数据源
-			customData: { outCode: '', inboxCode: '', imageFiles: [] },
+			customData: { retrievalOrder: '', productPackcode: '', imageFiles: [] },
 			// 产品表单数据源
 			formData: [],
 			// 产品表单数据源的字段副本 
 			formDataCopy: {
-				productCode: '',
+				productBarcode: '',
 				productName: '',
 				productModel: '',
 				certificateFiles: []
 			},
+			list: [],
 			// 当前页码数
 			currentPage: 0,
 			// 必填项目，对应formData的字段，只需要写“验证提示内容”皆可
 			formRules: {
-				barCode: '产品条码不能为空'
+				productBarcode: '产品条码不能为空'
 			}
 		};
 	},
@@ -106,11 +110,25 @@ export default {
 	created: function() {
 		// 将副本字段引用到表单data中
 		// 需要深拷贝，不然.push = 引用this.formDataCopy
-		this.formData.push(JSON.parse(JSON.stringify(this.formDataCopy)))
+		//this.formData.push(JSON.parse(JSON.stringify(this.formDataCopy)))
 	},
 	mounted: function() {
 	},
 	methods: {
+		delItem(index, item) {
+			let that = this;
+			uni.showModal({
+				title: '温馨提示',
+				content: '是否删除，'+item.productName,
+				success: function(res) {
+					if (res.confirm) {
+						that.formData.splice(index, 1);
+					} else if (res.cancel) {
+						console.log('用户点击取消');
+					}
+				}
+			});
+		},
 		// 选择文件后触发 - 支持多选
 		select(e, action) {
 			// tempFiles - Array[Files]
@@ -163,9 +181,44 @@ export default {
 			}
 		},
 		// 出库单号扫描
-		handleScanOut(){},
+		handleScanOut(){
+			let that = this;
+			uni.scanCode({
+				success: function(res) {
+					console.log('条码类型：' + res.scanType);
+					console.log('条码内容：' + res.result);
+					that.customData.retrievalOrder = res.result
+					that.$api('afterSale.scanOutPutOrder', {outputOrder: res.result}).then(res => {
+						if (res.flag) {
+							res.data.forEach((item)=>{
+								item.retrievalOrder = that.customData.retrievalOrder
+							})
+							that.formData = [...res.data,...that.formData]
+							console.log(that.formData)
+						}
+					});
+				}
+			});
+		},
 		// 装箱码扫描
-		handleScanInbox(){},
+		handleScanInbox(){
+			let that = this;
+			uni.scanCode({
+				success: function(res) {
+					console.log('条码类型：' + res.scanType);
+					console.log('条码内容：' + res.result);
+					that.customData.productPackcode = res.result
+					that.$api('afterSale.scanPackcode', {packcode: res.result}).then(res => {
+						if (res.flag) {
+							res.data.forEach((item)=>{
+								item.productPackcode = that.customData.productPackcode
+							})
+							that.formData = [...res.data,...that.formData]
+						}
+					});
+				}
+			});
+		},
 		// 产品条码扫描
 		handleScanBarCode(){},
 	}
