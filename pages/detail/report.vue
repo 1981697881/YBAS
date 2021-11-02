@@ -5,16 +5,16 @@
 			<view class="input-box flex">
 				<text class="input-label">上报日期</text>
 				<view class="flex-sub flex align-center">
-					<picker mode="date" :value="searchData.maxDate" @change="handleMaxDateChange">
+					<picker mode="date" :value="searchData.startDate" @change="handleMaxDateChange">
 						<view class="flex align-center">
-							<input type="text" v-model="searchData.maxDate" class="flex-sub" placeholder="开始日期" />
-							<text v-if="searchData.maxDate" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.maxDate')"></text>
+							<input type="text" v-model="searchData.startDate" class="flex-sub" placeholder="开始日期" />
+							<text v-if="searchData.startDate" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.startDate')"></text>
 						</view>
 					</picker>
-					<picker mode="date" :value="searchData.minDate" @change="handleMinDateChange">
+					<picker mode="date" :value="searchData.endDate" @change="handleMinDateChange">
 						<view class="flex align-center">
-							<input type="text" v-model="searchData.minDate" class="flex-sub" placeholder="结束日期" />
-							<text v-if="searchData.minDate" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.minDate')"></text>
+							<input type="text" v-model="searchData.endDate" class="flex-sub" placeholder="结束日期" />
+							<text v-if="searchData.endDate" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.endDate')"></text>
 						</view>
 					</picker>
 				</view>
@@ -33,16 +33,16 @@
 			</template>
 			<template v-for="(item, index) in list">
 				<uni-collapse :key="index">
-					<uni-collapse-item :title="'产品条码：' + item.barCode" showDelete @delete="handleDelList(item, index)">
+					<uni-collapse-item :title="'产品名称：' + item.productName" showDelete @delete="handleDelList(item, index)">
 						<template slot="title-right">
 							<view class="text-grey">2021/8/1/</view>
 						</template>
-						<view class="list-content" @click="handleShare(true, 'readonly')">
-							<input-box label="产品名称">
-								<text>{{ item.name }}</text>
+						<view class="list-content" @click="handleShare(true, 'readonly', item)">
+							<input-box label="产品条码">
+								<text>{{ item.productBarcode }}</text>
 							</input-box>
 							<input-box label="型号">
-								<text>{{ item.model }}</text>
+								<text>{{ item.productModel }}</text>
 							</input-box>
 							<input-box label="详情"><text class="text-blue" style="text-decoration: underline">点击查看详情</text></input-box>
 							<input-box label="处理状态">
@@ -88,9 +88,9 @@ export default {
 			// 查找的数据集
 			searchData: {
 				// 上报日期-最大日期
-				maxDate: null,
+				startDate: null,
 				// 上报日期-最小日期
-				minDate: null
+				endDate: null
 			},
 			// 查找的列表数据
 			list: [],
@@ -162,25 +162,44 @@ export default {
 			this.$refs['report-form'].addformData()
 		},
 		// 弹出层显示
-		handleShare(value, action) {
+		handleShare(value, action,item) {
+			let that = this;
+			that.shareStatus = value;
 			if (action === 'edit') {
 				// 表单可以编辑
-				this.isEdit = true
+				that.isEdit = true
 			} else if(action === 'readonly'){
 				// 表单不可以编辑
-				this.isEdit = false
+				that.isEdit = false
+				that.$nextTick(function(){
+					that.$refs['report-form'].formData.push(item)
+				})
+				formData.push(formData);
 			}
-			this.shareStatus = value;
 		},
 		handleDelList(item, index) {
+			const showToast = function(value) {
+				uni.showToast({
+					title: value,
+					mask: true,
+					icon: 'none',
+					duration: 1500
+				});
+			};
+			let that = this;
 			// item为当前要删除的list.data
 			uni.showModal({
 				title: `删除提示`,
-				content: `删除条码为：${item.barCode}`,
+				content: `删除条码为：${item.productBarcode}`,
 				success: res => {
 					if (res.confirm) {
 						// 确认删除
-						this.list.splice(index, 1);
+						that.$api('afterSale.deleteReport', {id: item.id}).then(reso => {
+							if (reso.flag) {
+								showToast(reso.msg);
+								that.getList();
+							}
+						});
 					} else if (res.cancel) {
 					}
 				}
@@ -188,11 +207,11 @@ export default {
 		},
 		// 选择购买日期 - 开始日期
 		handleMaxDateChange: function(e) {
-			this.searchData.maxDate = e.target.value;
+			this.searchData.startDate = e.target.value;
 		},
 		// 选择购买日期 - 结束日期
 		handleMinDateChange: function(e) {
-			this.searchData.minDate = e.target.value;
+			this.searchData.endDate = e.target.value;
 		},
 		// 点击扫描图标
 		handleScan(action) {
@@ -222,13 +241,15 @@ export default {
 		},
 		// api - 请求列表
 		getList() {
-			uni.showLoading({
-				title: '查找中'
+			let that = this;
+			that.isLoading = true;
+			that.loadStatus = 'loading';
+			that.$api('afterSale.reportList', that.searchData).then(res => {
+				if (res.flag) {
+					that.isLoading = false;
+					that.list = [...res.data];
+				}
 			});
-			this.list = mock.index.list
-			setTimeout(() => {
-				uni.hideLoading();
-			}, 1000);
 		}
 	}
 };

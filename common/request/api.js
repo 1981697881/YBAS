@@ -40,6 +40,16 @@ export default {
 			auth: true,
 			method: 'POST',
 			// desc: '上报',
+		},reportList: {
+			url: 'applet/report/list',
+			auth: true,
+			method: 'POST',
+			// desc: '上报列表',
+		},deleteReport: {
+			url: 'report/deleteReport',
+			auth: true,
+			method: 'POST',
+			// desc: '上报删除',
 		},
 		repairDetailUpdate: {
 			url: 'applet/repairDetail/update',

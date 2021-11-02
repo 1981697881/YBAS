@@ -9,17 +9,17 @@
 <template>
 	<view style="padding: 32rpx 0;">
 		<!-- 表单的父表start -->
-		<view class="address-warpper">
+		<view class="address-warpper" v-if="isEdit">
 			<input-box label="出库单号">
 				<view class="flex align-center">
 					<input class="flex-sub" type="text" v-model="customData.retrievalOrder" placeholder="请输入或扫描出库单号" :disabled="!isEdit" />
-					<uni-icons v-if="isEdit" type="scan" color="#808080" @tap="handleScanOut"></uni-icons>
+					<uni-icons  type="scan" color="#808080" @tap="handleScanOut"></uni-icons>
 				</view>
 			</input-box>
 			<input-box label="装箱码">
 				<view class="flex align-center">
 					<input class="flex-sub" type="text" v-model="customData.productPackcode" placeholder="请输入或扫描装箱码" :disabled="!isEdit" />
-					<uni-icons v-if="isEdit" type="scan" color="#808080" @tap="handleScanInbox"></uni-icons>
+					<uni-icons  type="scan" color="#808080" @tap="handleScanInbox"></uni-icons>
 				</view>
 			</input-box>
 		</view>
@@ -48,7 +48,7 @@
 			<input-box label="相关图片" v-if="currentPage == index">
 				<uni-file-picker v-model="item.certificateFiles" :disabled="!isEdit" :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg" @select="select($event, 'fault')" @delete="delFile($event, 'fault')" />
 			</input-box>
-			<button v-if="currentPage == index" class="cu-btn round line-red shadow" @tap="delItem(index,item)">移除当前行</button>
+			<button v-if="currentPage == index&& isEdit" class="cu-btn round line-red shadow" @tap="delItem(index,item)">移除当前行</button>
 			<!-- 表单的子表-多个end -->
 		</block>
 	</view>
