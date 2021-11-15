@@ -11,24 +11,24 @@
 			</view>
 			<view class="input-box flex">
 				<text class="input-label">维修单号</text>
-				<input type="text" v-model="searchData.fixCode" class="flex-sub" placeholder="请手动输入" />
-				<text v-if="searchData.fixCode" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.fixCode')"></text>
+				<input type="text" v-model="searchData.repairOrder" class="flex-sub" placeholder="请手动输入" />
+				<text v-if="searchData.repairOrder" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.repairOrder')"></text>
 			</view>
 			<view class="input-box flex">
 				<text class="input-label">报修日期</text>
 				<view class="flex-sub flex align-center">
-					<picker mode="date" :value="searchData.maxDate" @change="handleMaxDateChange">
+					<picker mode="date" :value="searchData.startDate" @change="handleMaxDateChange">
 						<view class="flex align-center">
-							<input type="text" v-model="searchData.maxDate" class="flex-sub" placeholder="开始日期" />
-							<!-- <text v-if="maxDate" class="text-clear text-blue">清空</text> -->
-							<text v-if="searchData.maxDate" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.maxDate')"></text>
+							<input type="text" v-model="searchData.startDate" class="flex-sub" placeholder="开始日期" />
+							<!-- <text v-if="startDate" class="text-clear text-blue">清空</text> -->
+							<text v-if="searchData.startDate" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.startDate')"></text>
 						</view>
 					</picker>
-					<picker mode="date" :value="searchData.minDate" @change="handleMinDateChange">
+					<picker mode="date" :value="searchData.endDate" @change="handleMinDateChange">
 						<view class="flex align-center">
-							<input type="text" v-model="searchData.minDate" class="flex-sub" placeholder="结束日期" />
-							<!-- <text v-if="minDate" class="text-clear text-blue">清空</text> -->
-							<text v-if="searchData.minDate" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.minDate')"></text>
+							<input type="text" v-model="searchData.endDate" class="flex-sub" placeholder="结束日期" />
+							<!-- <text v-if="endDate" class="text-clear text-blue">清空</text> -->
+							<text v-if="searchData.endDate" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.endDate')"></text>
 						</view>
 					</picker>
 				</view>
@@ -47,7 +47,7 @@
 			</template>
 			<template v-for="(item, index) in list">
 				<uni-collapse :key="index">
-					<uni-collapse-item :title="'维修单号：' + item.fixCode" :showArrow="true">
+					<uni-collapse-item :title="'维修单号：' + item.repairOrder" :showArrow="true">
 						<template slot="title-right">
 							<view :class="isPayStatus(item) ? 'text-green' : 'text-red'">{{ item.payStatus | filterPayStatus }}</view>
 						</template>
@@ -95,7 +95,7 @@
 						</view>
 					</uni-collapse-item>
 					<view class="flex uni-collapse-footer">
-						<view class="flex-sub text-blue text-center" @click="jump('/pages/detail/repairPayDetail', { fixCode: item.fixCode })">查看详细报价</view>
+						<view class="flex-sub text-blue text-center" @click="jump('/pages/detail/repairPayDetail', { repairOrder: item.repairOrder })">查看详细报价</view>
 						<view class="flex-sub text-center" :class="isPayStatus(item) ? 'text-grey' : 'text-blue'" @click="doPay(item)">支付维修费用：{{ item.price }}</view>
 					</view>
 				</uni-collapse>
@@ -137,13 +137,11 @@ export default {
 				// 产品条码
 				barCode: '',
 				// 维修单号
-				fixCode: '',
-				// 当前日期
-				date: '',
+				repairOrder: '',
 				// 购买日期-最大日期
-				maxDate: null,
+				startDate: null,
 				// 购买日期-最小日期
-				minDate: null
+				endDate: null
 			},
 			// 查找的列表数据
 			list: [],
@@ -189,7 +187,6 @@ export default {
 				});
 			};
 			// 该页面的formData是Array类型
-
 			for (let i = 0; i < formData.length; i++) {
 				const item = formData[i];
 				for (let key in formRules) {
@@ -248,20 +245,25 @@ export default {
 		},
 		// 选择购买日期 - 开始日期
 		handleMaxDateChange: function(e) {
-			this.searchData.maxDate = e.target.value;
+			this.searchData.startDate = e.target.value;
 		},
 		// 选择购买日期 - 结束日期
 		handleMinDateChange: function(e) {
-			this.searchData.minDate = e.target.value;
+			this.searchData.endDate = e.target.value;
 		},
 		// 点击扫描图标
 		handleScan(action) {
-			if (action === 'edit') {
-				// 在登记界面点击的扫描图标
-			} else {
-				// 默认点击列表页的扫描图标
-			}
-			console.log('点击扫描图标');
+			let that = this;
+			uni.scanCode({
+				success: function(res) {
+					if (action === 'edit') {
+						
+						// 在登记界面点击的扫描图标
+					} else {
+						that.searchData.barCode = res.result;
+					}
+				}
+			});
 		},
 		// 查询条件的所有输入框一键清空内容功能
 		// key 对应的v-model键名
@@ -318,58 +320,16 @@ export default {
 		},
 		// api - 请求列表
 		getList() {
+			let that = this;
 			uni.showLoading({
 				title: '查找中'
 			});
-			setTimeout(() => {
-				uni.hideLoading();
-			}, 1000);
-			this.list = [
-				{
-					fixCode: 'BX202108010001',
-					price: '90',
-					payStatus: 0,
-					list: [
-						{
-							barCode: '202108010001',
-							name: '直发器',
-							model: 'JPA40W',
-							bounghtDate: 'Mon Sep 13 2021 23:53:02 GMT+0800 (中国标准时间)',
-							expireDate: 'Mon Sep 13 2021 23:53:02 GMT+0800 (中国标准时间)',
-							faultDesc: '插电没反应',
-							fixDesc: '维修说明',
-							fixStatus: 0
-						},
-						{
-							barCode: '202108010002',
-							name: '直发器',
-							model: 'JPA40W',
-							bounghtDate: 'Mon Sep 13 2021 23:53:02 GMT+0800 (中国标准时间)',
-							expireDate: 'Mon Sep 13 2021 23:53:02 GMT+0800 (中国标准时间)',
-							faultDesc: '加热慢',
-							fixDesc: '维修说明2',
-							fixStatus: 0
-						}
-					]
-				},
-				{
-					fixCode: 'BX202108010001',
-					price: '90',
-					payStatus: 1,
-					list: [
-						{
-							barCode: '202108010001',
-							name: '直发器',
-							model: 'JPA40W',
-							bounghtDate: 'Mon Sep 13 2021 23:53:02 GMT+0800 (中国标准时间)',
-							expireDate: 'Mon Sep 13 2021 23:53:02 GMT+0800 (中国标准时间)',
-							faultDesc: '插电没反应',
-							fixDesc: '维修说明',
-							fixStatus: 0
-						}
-					]
+			that.$api('afterSale.repairList', that.searchData).then(res => {
+				if (res.flag) {
+					uni.hideLoading();
+					that.list = [...res.data];
 				}
-			];
+			});
 			this.setListPage();
 		}
 	}

@@ -41,7 +41,7 @@ export default {
 	.input-label {
 		position: relative;
 		margin-right: 24rpx;
-		min-width: 4em;
+		min-width: 5em;
 		padding-left: 30rpx;
 		&::after {
 			content: ':';

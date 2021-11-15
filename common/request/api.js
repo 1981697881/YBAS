@@ -72,6 +72,11 @@ export default {
 			auth: true,
 			method: 'GET',
 			// desc: '装箱码扫描产品',
+		},productionMessage: {
+			url: 'productBarcode/productionMessage',
+			auth: true,
+			method: 'POST',
+			// desc: '装箱码扫描产品',
 		},
 
 	},

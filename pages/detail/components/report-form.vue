@@ -37,12 +37,11 @@
 				<input-box label="产品条码" required>
 					<view class="flex align-center">
 						<input class="flex-sub" type="text" v-model="item.productBarcode" placeholder="请输入或扫描产品包装盒上的条码" :disabled="!isEdit" />
-						<uni-icons v-if="isEdit" type="scan" color="#808080" @tap="handleScanBarCode"></uni-icons>
+						<uni-icons v-if="isEdit" type="scan" color="#808080" @tap="handleScanBarCode(item)"></uni-icons>
 					</view>
 				</input-box>
 				<input-box label="产品名称"><input type="text" v-model="item.productName" placeholder="根据条码自动填充" disabled /></input-box>
 				<input-box label="产品型号"><input type="text" v-model="item.productModel" placeholder="根据条码自动填充" disabled /></input-box>
-				
 			</view>
 			<!-- 支持多选 -->
 			<input-box label="相关图片" v-if="currentPage == index">

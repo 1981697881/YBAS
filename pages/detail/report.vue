@@ -242,11 +242,12 @@ export default {
 		// api - 请求列表
 		getList() {
 			let that = this;
-			that.isLoading = true;
-			that.loadStatus = 'loading';
+			uni.showLoading({
+				title: '查找中'
+			});
 			that.$api('afterSale.reportList', that.searchData).then(res => {
 				if (res.flag) {
-					that.isLoading = false;
+					uni.hideLoading();
 					that.list = [...res.data];
 				}
 			});
