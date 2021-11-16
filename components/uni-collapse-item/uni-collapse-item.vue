@@ -10,7 +10,6 @@
 						<text class="uni-collapse-item__title-text">{{ title }}</text>
 					</view>
 				</slot>
-				
 			</view>
 			<view class="" style="font-size: 28rpx;">
 				<slot name="title-right"></slot>
@@ -334,7 +333,7 @@
 
 			&-text {
 				flex: 1;
-				font-size: $uni-font-size-base;
+				//font-size: $uni-font-size-base;
 				/* #ifndef APP-NVUE */
 				white-space: nowrap;
 				color: inherit;

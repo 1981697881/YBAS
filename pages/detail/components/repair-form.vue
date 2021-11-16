@@ -45,7 +45,7 @@
 				<input-box label="产品名称"><input type="text" v-model="item.productName" disabled /></input-box>
 				<input-box label="产品型号"><input type="text" v-model="item.productModel" disabled /></input-box>
 				<input-box label="购买日期" required>
-					<picker mode="date" v-model="item.productBuyDate" @change="handleBounghtDateChange(item)">
+					<picker mode="date" v-model="item.productBuyDate" @change="handleBounghtDateChange($event,item)">
 						<view class="flex align-center"><input type="text" v-model="item.productBuyDate"
 								class="flex-sub" placeholder="请选择日期" /></view>
 					</picker>
@@ -54,7 +54,7 @@
 						placeholder="自动计算,最少一年" /></input-box>
 				<input-box label="故障说明"><textarea v-model="item.faultDescription" placeholder="填写故障说明" /></input-box>
 				<input-box label="售后要求" required>
-					<picker v-model="item.salesRequirements" :range="afterSalesList" @change="handleAfterSales(item)">
+					<picker v-model="item.salesRequirements" :range="afterSalesList" @change="handleAfterSales($event,item)">
 						<view class="flex">
 							<view class=" flex-sub">{{ afterSalesList[item.salesRequirements] }}</view>
 							<uni-icons type="arrowdown" color="#808080"></uni-icons>
@@ -63,13 +63,13 @@
 				</input-box>
 				<!-- 支持多选 -->
 				<input-box label="故障图片" v-if="currentPage == index">
-					<uni-file-picker v-model="item.faultPhoto" :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg"
-						@select="select($event, 'fault')" @delete="delFile($event, 'fault')" />
+					<uni-file-picker :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg"
+						@select="select($event, 'fault',item)" @delete="delFile($event, 'fault',item)" />
 				</input-box>
 				<!-- 支持多选 -->
 				<input-box label="购买凭证" v-if="currentPage == index">
-					<uni-file-picker v-model="item.voucher" :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg"
-						@select="select($event, 'certificate')" @delete="delFile($event, 'certificate')" />
+					<uni-file-picker :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg"
+						@select="select($event, 'certificate',item)" @delete="delFile($event, 'certificate',item)" />
 				</input-box>
 				<button v-if="currentPage == index" class="cu-btn round line-red shadow"
 					@tap="delItem(index,item)">移除当前行</button>
@@ -108,8 +108,8 @@
 					productGuarantee: '',
 					faultDescription: '',
 					salesRequirements: 0,
-					faultPhoto: [],
-					voucher: []
+					faultPhotoArrays: [],
+					voucherArrays: []
 				},
 				// 当前页码数
 				currentPage: 0,
@@ -165,10 +165,24 @@
 						item.productCode = res.result
 						that.$api('afterSale.productionMessage', {productBarcode: res.result}).then(res => {
 							if (res.flag) {
-								item.productName = res.productName
-								item.productModel = res.productModel
+								item.productName = res.data.productName
+								item.productModel = res.data.productModel
 							}
 						});
+					}
+				});
+			},
+			delItem(index, item) {
+				let that = this;
+				uni.showModal({
+					title: '温馨提示',
+					content: '是否删除，'+item.productName,
+					success: function(res) {
+						if (res.confirm) {
+							that.formData.splice(index, 1);
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+						}
 					}
 				});
 			},
@@ -187,48 +201,55 @@
 			},
 			
 			// 选择文件后触发 - 支持多选
-			select(e, action) {
+			select(e, action, val) {
 				// tempFiles - Array[Files]
 				// 控制台查看该组件的files数据类型
 				// console.log('选择文件：', e);
 				e.tempFiles.map((item, index) => {
-					let actionData;
+					console.log(item)
 					if (action === 'fault') {
 						// 故障图片
-						actionData = this.formData.faultPhoto;
+						let actionData = val.faultPhotoArrays;
+						actionData.push(item.url);
 					} else if (action === 'certificate') {
 						// 凭证图片
-						actionData = this.formData.voucher;
+						let actionData = val.voucherArrays;
+						actionData.push(item.url);
 					}
 					// TODO 根据业务需求修改所需要的数据，以下代码目前用作前端测试用
-					actionData.push({
-						file: item.file,
-						uuid: item.uuid
-					});
+					
 				});
 			},
 			// 文件从列表移除时触发
-			delFile(e, action) {
+			delFile(e, action, val) {
 				// tempFile - Object[Files]
 				const {
-					uuid
+					url
 				} = e.tempFile;
 				// 需要操作的目标对象
 				let actionData;
 				if (action === 'fault') {
 					// 故障图片
-					actionData = this.formData.faultPhoto;
+					let actionData = val.faultPhotoArrays;
+					for (let i = 0; i < actionData.length; i++) {
+						// 删除对应的file
+						if (actionData[i] === uuid) {
+							actionData.splice(i, 1);
+							return;
+						}
+					}
 				} else if (action === 'certificate') {
 					// 凭证图片
-					actionData = this.formData.voucher;
-				}
-				for (let i = 0; i < actionData.length; i++) {
-					// 删除对应的file
-					if (actionData[i].uuid === uuid) {
-						actionData.splice(i, 1);
-						return;
+					let actionData = val.voucherArrays;
+					for (let i = 0; i < actionData.length; i++) {
+						// 删除对应的file
+						if (actionData[i] === url) {
+							actionData.splice(i, 1);
+							return;
+						}
 					}
 				}
+				
 			},
 			// 追加产品
 			addformData() {
@@ -255,12 +276,22 @@
 				}
 			},
 			// 售后要求选择器
-			handleAfterSales: function(e) {
-				this.proData.afterSales = e.target.value;
+			handleAfterSales: function(e,item) {
+				item.salesRequirements = e.target.value;
 			},
 			// 购买日期选择器
-			handleBounghtDateChange: function(e) {
-				this.proData.productBuyDate = e.target.value;
+			handleBounghtDateChange: function(e,item) {
+				item.productBuyDate = e.target.value;
+				// TODO 其实只需要在getFullYear的基础上+1就好了 *.*
+				const nowTime = new Date(e.target.value).getTime();
+				// 时间加1年（365天）的毫秒数
+				const newTime = nowTime + 1000 * 60 * 60 * 24 * 365;
+				const newDate = new Date(newTime),
+					year = newDate.getFullYear(),
+					month = newDate.getMonth() + 1,
+					day = newDate.getDate();
+				item.productGuarantee =
+					`${year}-${month.toString().length == 1 ? '0' : ''}${month}-${day.toString().length == 1 ? '0' : ''}${day}`;
 			},
 		}
 	};

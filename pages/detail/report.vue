@@ -151,11 +151,12 @@ export default {
 			that.$api('afterSale.reportAdd', {reports:formData}).then(res => {
 				if (res.flag) {
 					showToast(res.msg);
+					this.shareStatus = false;
+					this.isEdit = false;
 					that.getList();
 				}
 			});
-			this.shareStatus = false;
-			this.isEdit = false;
+			
 		},
 		// 追加产品
 		addformData(){

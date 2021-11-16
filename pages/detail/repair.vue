@@ -52,43 +52,43 @@
 							<view :class="isPayStatus(item) ? 'text-green' : 'text-red'">{{ item.payStatus | filterPayStatus }}</view>
 						</template>
 						<view class="list-content">
-							<view class="flex align-start">
+							<view class="flex align-start" v-for="(detail,detailIndex) in item.repairDetailList" :key="detailIndex">
 								<view class="flex-sub">
 									<input-box label="产品条码">
-										<text>{{ item.list[item.currentPage].barCode }}</text>
+										<text>{{ detail.productCode }}</text>
 									</input-box>
 									<input-box label="产品名称">
-										<text>{{ item.list[item.currentPage].name }}</text>
+										<text>{{ detail.productName }}</text>
 									</input-box>
 									<input-box label="型号">
-										<text>{{ item.list[item.currentPage].model }}</text>
+										<text>{{ detail.productModel }}</text>
 									</input-box>
 									<input-box label="购买日期">
-										<text>{{ item.list[item.currentPage].bounghtDate | formatDate }}</text>
+										<text>{{ detail.productBuyDate | formatDate }}</text>
 									</input-box>
 									<input-box label="保修期至">
-										<text>{{ item.list[item.currentPage].expireDate | formatDate }}</text>
+										<text>{{ detail.productGuarantee | formatDate }}</text>
 									</input-box>
 									<input-box label="故障说明">
-										<text>{{ item.list[item.currentPage].faultDesc }}</text>
+										<text>{{ detail.faultDescription }}</text>
 									</input-box>
 									<input-box label="维修说明">
-										<text>{{ item.list[item.currentPage].fixDesc }}</text>
+										<text>{{ detail.salesRequirements }}</text>
 									</input-box>
 									<input-box label="维修状态">
-										<text>{{ item.list[item.currentPage].fixStatus | filterFixStatus }}</text>
+										<text>{{ detail.status | filterFixStatus }}</text>
 									</input-box>
 									<input-box label="寄件信息"><text class="text-blue">点击查看</text></input-box>
 								</view>
-								<view class="" style="color: #bbbbbb;">
+								<!-- <view class="" style="color: #bbbbbb;">
 									进入详情
 									<uni-icons type="arrowright" color="#bbbbbb"></uni-icons>
-								</view>
+								</view> -->
 							</view>
 							<!-- 列表项分页器start -->
 							<view class="flex">
 								<uni-icons class="flex-sub text-center" type="arrowleft" @click="handlePageChange('prev', item)"></uni-icons>
-								<text class="">{{ item.currentPage + 1 }}/{{ item.list.length }}</text>
+								<text class="">{{ item.currentPage + 1 }}/{{ item.repairDetailList.length }}</text>
 								<uni-icons class="flex-sub text-center" type="arrowright" @click="handlePageChange('next', item)"></uni-icons>
 							</view>
 							<!-- 列表项分页器end -->
@@ -96,7 +96,7 @@
 					</uni-collapse-item>
 					<view class="flex uni-collapse-footer">
 						<view class="flex-sub text-blue text-center" @click="jump('/pages/detail/repairPayDetail', { repairOrder: item.repairOrder })">查看详细报价</view>
-						<view class="flex-sub text-center" :class="isPayStatus(item) ? 'text-grey' : 'text-blue'" @click="doPay(item)">支付维修费用：{{ item.price }}</view>
+						<view class="flex-sub text-center" :class="isPayStatus(item) ? 'text-grey' : 'text-blue'" @click="doPay(item)">支付维修费用：{{ item.price || '未报价' }}</view>
 					</view>
 				</uni-collapse>
 			</template>
@@ -205,13 +205,14 @@ export default {
 					}
 				}
 			}
-			that.$api('afterSale.repairDetailAdd', formData).then(res => {
+			contactData.repairDetail = formData;
+			that.$api('afterSale.repairDetailAdd', contactData).then(res => {
 				if (res.flag) {
-					
+					showToast(res.msg);
+					that.shareStatus = false;
+					that.getList();
 				}
 			});
-			showToast('提交成功');
-			that.shareStatus = false;
 		},
 		// 支付维修费用
 		doPay(item) {
@@ -295,7 +296,7 @@ export default {
 				}
 			} else if (action === 'next') {
 				// 下一页
-				if (item.currentPage < item.list.length - 1) {
+				if (item.currentPage < item.repairDetailList.length - 1) {
 					item.currentPage++;
 				}
 			}
@@ -327,6 +328,9 @@ export default {
 			that.$api('afterSale.repairList', that.searchData).then(res => {
 				if (res.flag) {
 					uni.hideLoading();
+					res.data.forEach((item)=>{
+						item.currentPage = 0;
+					})
 					that.list = [...res.data];
 				}
 			});
