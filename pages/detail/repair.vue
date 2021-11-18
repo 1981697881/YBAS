@@ -49,7 +49,7 @@
 				<uni-collapse :key="index">
 					<uni-collapse-item :title="'维修单号：' + item.repairOrder" :showArrow="true">
 						<template slot="title-right">
-							<view :class="isPayStatus(item) ? 'text-green' : 'text-red'">{{ item.payStatus | filterPayStatus }}</view>
+							<view :class="isPayStatus(item) ? 'text-red' : 'text-green'">{{ item.payStatus | filterPayStatus }}</view>
 						</template>
 						<view class="list-content">
 							<view class="flex align-start" v-for="(detail,detailIndex) in item.repairDetailList" :key="detailIndex">
@@ -73,7 +73,7 @@
 										<text>{{ detail.faultDescription }}</text>
 									</input-box>
 									<input-box label="维修说明">
-										<text>{{ detail.salesRequirements }}</text>
+										<text>{{ detail.repairOpinion }}</text>
 									</input-box>
 									<input-box label="维修状态">
 										<text>{{ detail.status | filterFixStatus }}</text>
@@ -96,7 +96,7 @@
 					</uni-collapse-item>
 					<view class="flex uni-collapse-footer">
 						<view class="flex-sub text-blue text-center" @click="jump('/pages/detail/repairPayDetail', { repairOrder: item.repairOrder })">查看详细报价</view>
-						<view class="flex-sub text-center" :class="isPayStatus(item) ? 'text-grey' : 'text-blue'" @click="doPay(item)">支付维修费用：{{ item.price || '未报价' }}</view>
+						<view class="flex-sub text-center" :class="isPayStatus(item) ? 'text-blue' : 'text-grey'" @click="doPay(item)">支付维修费用：{{ item.status>=3?item.payPrice: "未完成" }}</view>
 					</view>
 				</uni-collapse>
 			</template>
@@ -171,7 +171,7 @@ export default {
 			})
 		},
 		// 该维修单是否已支付，传入当前维修单的data；0 未支付。1 已支付
-		isPayStatus: item => item.payStatus == 1,
+		isPayStatus: item => item.status == '3',
 		// 登记界面的表单提交
 		submit() {
 			let that = this;
@@ -216,10 +216,17 @@ export default {
 		},
 		// 支付维修费用
 		doPay(item) {
-			if (!this.isPayStatus(item)) {
+			if (this.isPayStatus(item)) {
 				// ...
 				uni.showToast({
 					title: '支付成功',
+					mask: true,
+					icon: 'none',
+					duration: 1500
+				});
+			}else{
+				uni.showToast({
+					title: '账单未出，暂不可支付，详情请咨询客服人员',
 					mask: true,
 					icon: 'none',
 					duration: 1500

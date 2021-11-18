@@ -13,7 +13,7 @@
 				<!--  -->
 				<u-grid-item v-for="(item, index) in meau" :custom-style="{ padding: '0', textAlign: 'center' }" :key="index">
 					<!-- <uni-icons :type="item.icon"></uni-icons> -->
-					<view style="padding: 60rpx 0;"><button v-if="index<4" @tap="jump(item.path)" class="cu-btn round shadow line-black">{{ item.name }}</button><button v-else open-type="contact" class="cu-btn round shadow line-black">{{ item.name }}</button></view>
+					<view style="padding: 60rpx 0;"><button v-if="index<4" @tap="jump(item.path,{},index)" class="cu-btn round shadow line-black">{{ item.name }}</button><button v-else open-type="contact" class="cu-btn round shadow line-black">{{ item.name }}</button></view>
 				</u-grid-item>
 			</u-grid>
 		</view>
@@ -56,24 +56,24 @@
 
 			<!-- 报修列表 start -->
 			<uni-collapse v-for="(item, index) in currentList" :key="index">
-				<uni-collapse-item :title="'维修单号：' + item.oid" :open="index === 0">
+				<uni-collapse-item :title="'维修单号：' + item.repairOrder" :open="index === 0">
 					<view class="list-item">
 						<input-box label="产品条码">
-							<text>{{ item.list[item.page].barCode }}</text>
+							<text>{{ item.repairDetailList[item.page].productCode }}</text>
 						</input-box>
 						<input-box label="产品名称">
-							<text>{{ item.list[item.page].name }}</text>
+							<text>{{ item.repairDetailList[item.page].productName }}</text>
 						</input-box>
 						<input-box label="型号">
-							<text>{{ item.list[item.page].model }}</text>
+							<text>{{ item.repairDetailList[item.page].productModel }}</text>
 						</input-box>
 						<input-box label="维修状态">
-							<text>{{ item.list[item.page].status | getStatus }}</text>
+							<text>{{ item.repairDetailList[item.page].status | getStatus }}</text>
 						</input-box>
 					</view>
-					<custom-pagination class="margin-box" :page="item.page" :total="item.list.length" @onChange="handlePageChange($event, item)" ></custom-pagination>
+					<custom-pagination class="margin-box" :page="item.page" :total="item.repairDetailList.length" @onChange="handlePageChange($event, item)" ></custom-pagination>
 					<view class="btn-warpper text-center">
-						<text :class="tabCurrent === 0 ? 'text-blue':'text-grey'" @click="doPay(item)">支付维修费用：￥{{ item.price }}</text>
+						<text :class="tabCurrent === 0 ? 'text-blue':'text-grey'" @click="doPay(item)">支付维修费用：{{ item.status>=3? '￥'+item.payPrice: "未完成" }}</text>
 					</view>
 				</uni-collapse-item>
 			</uni-collapse>
@@ -106,7 +106,8 @@ export default {
 	computed: {
 		// 展示tabs对应状态的报修列表数据，未完成/已完成
 		currentList() {
-			return this.list && this.list.reduce((prev, item) => prev.concat(item.status == this.tabCurrent ? item : []), []);
+			console.log(this.list && this.list.reduce((prev, item) => prev.concat(item.status == this.tabCurrent.toString() ? item : []), []))
+			return this.list && this.list.reduce((prev, item) => prev.concat(item.status == this.tabCurrent.toString() ? item : []), []);
 		},
 	},
 	mounted() {
@@ -155,14 +156,47 @@ export default {
 			this.init();
 		},
 		// 路由跳转
-		jump(path, params) {
+		jump(path, params,index) {
+			let that = this
 			let obj = { ...params };
-			// path路径必须以“/”开头
-			if (path && path[0] === '/') {
-				this.$Router.push({
-					path: path,
-					query: obj
+			if(index == 3){
+				this.$api('afterSale.isEmployee', {
+				}).then(res => {
+					if (res.flag) {
+						if(!res.data){
+							uni.showModal({
+								title: '温馨提示',
+								content: '该功能需绑定业务员，是否跳转绑定页面',
+								success: function(res) {
+									if (res.confirm) {
+										that.$Router.push({
+											path: '/pages/index/register',
+											query: {}
+										});
+									} else if (res.cancel) {
+										console.log('用户点击取消');
+									}
+								}
+							});
+						}else{
+							// path路径必须以“/”开头
+							if (path && path[0] === '/') {
+								that.$Router.push({
+									path: path,
+									query: obj
+								});
+							}
+						}
+					}
 				});
+			}else{
+				// path路径必须以“/”开头
+				if (path && path[0] === '/') {
+					this.$Router.push({
+						path: path,
+						query: obj
+					});
+				}
 			}
 		},
 		doPay(item){
@@ -177,10 +211,9 @@ export default {
 			// 停止当前页面下拉刷新。
 			uni.stopPullDownRefresh();
 			// 每个单号下的独立列表赋予当前选中页属性
-			console.log(this.currentList);
 			let that = this;
 			this.$api('afterSale.repairList', {
-				status: that.tabCurrent
+				status: that.tabCurrent == 1?5:that.tabCurrent
 			}).then(res => {
 				if (res.flag) {
 					this.list = res.data.map(item => Object.assign(item, { page: 0 }));

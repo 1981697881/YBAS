@@ -77,6 +77,21 @@ export default {
 			auth: true,
 			method: 'POST',
 			// desc: '装箱码扫描产品',
+		},repairMessage: {
+			url: 'repairDetail/repairMessage',
+			auth: true,
+			method: 'POST',
+			// desc: '保修单详情',
+		},isEmployee: {
+			url: 'employeeShouhou/isEmployee',
+			auth: true,
+			method: 'POST',
+			// desc: '判断是否绑定业务员',
+		},bindingEmployee: {
+			url: 'employeeShouhou/bindingEmployee',
+			auth: true,
+			method: 'POST',
+			// desc: '绑定业务员',
 		},
 
 	},

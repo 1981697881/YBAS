@@ -1,58 +1,59 @@
 <template>
 	<view>
-		<cell-box label="维修单号" :value="fixCode"></cell-box>
-		<cell-box label="总费用" :value="formData.totalPrice | rmb"></cell-box>
+		<cell-box label="维修单号" :value="formData.repairOrder"></cell-box>
+		<cell-box label="总费用" :value="formData.payPrice | rmb"></cell-box>
 		<cell-box label="付款状态">
 			<template slot="value">
 				<view @click="doPay">
 					<text class="text-grey">{{ formData.payStatus | filterPayStatus }}</text>
-					<view v-if="!isPayStatus" class="text-blue" :style="{ 'margin-top': !isPayStatus ? '16rpx' : '' }"><text>去支付</text></view>
+					<view v-if="isPayStatus" class="text-blue" :style="{ 'margin-top': !isPayStatus ? '16rpx' : '' }"><text>去支付</text></view>
 				</view>
 			</template>
 		</cell-box>
-
 		<!-- 分页器start -->
-		<cell-box style="margin-top: 30rpx;">
+		<cell-box style="margin-top: 30rpx;" v-if="formData.repairDetailList.length>0">
 			<template slot="value">
 				<view class="flex align-center">
-					<uni-icons class="flex-sub text-center" type="arrowleft" @click="handlePageChange('prev', 'currentPage', formData.list.length)"></uni-icons>
-					<text class="">{{ currentPage + 1 }}/{{ formData.list.length }}</text>
-					<uni-icons class="flex-sub text-center" type="arrowright" @click="handlePageChange('next', 'currentPage', formData.list.length)"></uni-icons>
+					<uni-icons class="flex-sub text-center" type="arrowleft" @click="handlePageChange('prev', 'currentPage', formData.repairDetailList.length)"></uni-icons>
+					<text class="">{{ currentPage + 1 }}/{{ formData.repairDetailList.length }}</text>
+					<uni-icons class="flex-sub text-center" type="arrowright" @click="handlePageChange('next', 'currentPage', formData.repairDetailList.length)"></uni-icons>
 				</view>
 			</template>
 		</cell-box>
 		<!-- 分页器end -->
-
+		<block v-for="(item, index) in formData.repairDetailList" :key="index" v-if="currentPage == index">
 		<!-- 产品列表start -->
-		<cell-box label="产品条码" :value="proData.barCode"></cell-box>
-		<cell-box label="产品名称" :value="proData.name"></cell-box>
-		<cell-box label="产品型号" :value="proData.model"></cell-box>
-		<cell-box label="维修意见" :value="proData.fixIdea"></cell-box>
-		<cell-box label="配件费用" :value="proData.componentPrice | rmb">
+		<cell-box label="产品条码" :value="proData.productCode"></cell-box>
+		<cell-box label="产品名称" :value="proData.productName"></cell-box>
+		<cell-box label="产品型号" :value="proData.productModel"></cell-box>
+		<cell-box label="维修意见" :value="proData.repairOpinion"></cell-box>
+		<cell-box label="配件费用" :value="proData.partsMoney | rmb">
 			<template slot="value">
 				<view @click="handleShare(true)">
-					<text class="text-grey">{{ proData.componentPrice | rmb }}</text>
+					<text class="text-grey">{{ proData.partsMoney | rmb }}</text>
 					<view class="text-blue" :style="{ 'margin-top': !isPayStatus ? '16rpx' : '' }"><text>查看配件清单</text></view>
 				</view>
 			</template>
 		</cell-box>
-		<cell-box label="工时费" :value="proData.workPrice | rmb"></cell-box>
+		<cell-box label="工时费" :value="proData.workMoney | rmb"></cell-box>
 		<cell-box label="运费" :value="proData.freight | rmb"></cell-box>
-		<cell-box label="优惠后价格" :value="proData.discountPrice | rmb"></cell-box>
+		<cell-box label="优惠后价格" :value="proData.discountMoney | rmb"></cell-box>
 		<!-- 产品列表end -->
-
+		</block>
 		<!--配件清单弹出层start -->
 		<custom-share :show="shareStatus" title="配件清单" @close="handleShare">
 			<view class="" style="padding: 30rpx 0;">
-				<input-box label="零件编码"></input-box>
-				<input-box label="零件名称"></input-box>
-				<input-box label="版本号"></input-box>
-				<input-box label="销售价格"></input-box>
+				<block v-for="(item, index) in proData.repairDetailParts" :key="index" v-if="componentCurrentPage == index">
+					<input-box label="零件编码">{{item.partsCode}}</input-box>
+					<input-box label="零件名称">{{item.partsName}}</input-box>
+					<input-box label="版本号">{{item.partsEdition}}</input-box>
+					<input-box label="销售价格">{{item.partsPrice}}</input-box>
+				</block>
 				<!-- 配件清单分页器start -->
-				<view class="flex align-center">
-					<uni-icons class="flex-sub text-center" type="arrowleft" @click="handlePageChange('prev', 'componentCurrentPage', proData.componentList.length)"></uni-icons>
-					<text class="">{{ componentCurrentPage + 1 }}/{{ proData.componentList.length }}</text>
-					<uni-icons class="flex-sub text-center" type="arrowright" @click="handlePageChange('next', 'componentCurrentPage', proData.componentList.length)"></uni-icons>
+				<view class="flex align-center" v-if="proData.repairDetailParts.length>0">
+					<uni-icons class="flex-sub text-center" type="arrowleft" @click="handlePageChange('prev', 'componentCurrentPage', proData.repairDetailParts.length)"></uni-icons>
+					<text class="">{{ componentCurrentPage + 1 }}/{{ proData.repairDetailParts.length }}</text>
+					<uni-icons class="flex-sub text-center" type="arrowright" @click="handlePageChange('next', 'componentCurrentPage', proData.repairDetailParts.length)"></uni-icons>
 				</view>
 				<!-- 配件清单分页器end -->
 			</view>
@@ -72,30 +73,7 @@ export default {
 	data() {
 		return {
 			fixCode: '',
-			formData: {
-				totalPrice: 0,
-				payStatus: 0,
-				list: [
-					{
-						barCode: '',
-						name: '',
-						model: '',
-						fixIdea: '',
-						componentPrice: 0,
-						componentList: [
-							{
-								componentCode: '',
-								componentName: '',
-								componentVersion: '',
-								salesPrice: 0
-							}
-						],
-						workPrice: 0,
-						freight: 0,
-						discountPrice: 0
-					}
-				]
-			},
+			formData: {},
 			currentPage: 0,
 			componentCurrentPage: 0,
 			shareStatus: false
@@ -104,10 +82,10 @@ export default {
 	computed: {
 		// 该维修单是否已支付，传入当前维修单的data；0 未支付。1 已支付
 		isPayStatus() {
-			return this.formData.payStatus == 1;
+			return this.formData.status == '3';
 		},
 		proData() {
-			return this.formData.list[this.currentPage];
+			return this.formData.repairDetailList[this.currentPage];
 		}
 	},
 	filters: {
@@ -122,19 +100,26 @@ export default {
 		}
 	},
 	watch: {},
-	created() {
+	onLoad() {
+		const repairOrder = this.$Route.query.repairOrder;
+		this.getDetailList({repairOrder: repairOrder});
 	},
 	mounted() {
-		// 使用computed失效，手动给fixCode赋值
-		this.fixCode =  this.$Route.query.fixCode;
 	},
 	methods: {
 		// 支付维修费用
 		doPay(item) {
-			if (!this.isPayStatus) {
+			if (this.isPayStatus) {
 				// ...
 				uni.showToast({
 					title: '支付成功',
+					mask: true,
+					icon: 'none',
+					duration: 1500
+				});
+			}else{
+				uni.showToast({
+					title: '账单未出，暂不可支付，详情请咨询客服人员',
 					mask: true,
 					icon: 'none',
 					duration: 1500
@@ -161,7 +146,17 @@ export default {
 			}
 			console.log(typeof this[pageKey])
 		},
-		getList(){
+		getDetailList(val){
+			let that = this
+			uni.showLoading({
+				title: 'loading...'
+			});
+			that.$api('afterSale.repairMessage', val).then(res => {
+				if (res.flag) {
+					that.formData = res.data
+					uni.hideLoading();
+				}
+			});
 		},
 	}
 };
