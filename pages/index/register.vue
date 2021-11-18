@@ -3,21 +3,22 @@
 		<!-- 背景图 -->
 		<view class="x-c"></view>
 		<!-- titleview -->
-		<view class="head-box"><cu-custom >
+		<!-- <view class="head-box"><cu-custom >
 		<block slot="content">
 			<text class="nav-title app-selector-rect text-black">注册</text>
-		</block></cu-custom></view>
+		</block></cu-custom>
+		</view> -->
 		<view class="wrapper">
 			<!-- logo -->
 			<!-- 表单 -->
 			<view class="login-box y-f">
 				<view class="input-item x-c">
-					<text class="inp-title">编&emsp;码</text>
-					<input class="inp" v-model="number" type="number" placeholder="请输入编码" placeholder-class="pl" />
+					<text class="inp-title">内&emsp;码</text>
+					<input class="inp" v-model="employeeInternalCode" type="number" placeholder="请输入编码" placeholder-class="pl" />
 				</view>
 				<view class="input-item x-c">
 					<text class="inp-title">密&emsp;码</text>
-					<input class="inp" password v-model="password" type="text" placeholder="请输入6-14位密码" placeholder-class="pl" />
+					<input class="inp" password v-model="employeePassword" type="text" placeholder="请输入6-14位密码" placeholder-class="pl" />
 				</view>
 			</view>
 			<!-- 登录按钮 -->
@@ -31,8 +32,8 @@ import Wechat from '@/common/wechat/wechat'
 export default {
 	data() {
 		return {
-			number: '',
-			password: '',
+			employeeInternalCode: '',
+			employeePassword: '',
 			sysInfo: uni.getStorageSync('sysInfo')
 		};
 	},
@@ -73,11 +74,10 @@ export default {
 		},
 		register() {
 			let that = this;
-			if (this.userInfo) {
-				this.$api('user.setUserAuthority', {
-					fnumber: that.number,
-					openId: that.userInfo.openId,
-					password: this.password
+			if (that.userInfo) {
+				that.$api('afterSale.bindingEmployee', {
+					employeeInternalCode: that.employeeInternalCode,
+					employeePassword: that.employeePassword
 				}).then(res => {
 					if (res.flag) {
 						uni.showToast({
@@ -96,7 +96,7 @@ export default {
 					}
 				});
 			} else {
-				this.getuserinfo();
+				that.getuserinfo();
 			}
 		},
 
