@@ -23,7 +23,6 @@ export default {
 							platform = 'H5';
 						}
 						// #endif
-
 						// #ifdef APP-PLUS
 						platform = 'App';
 						if (e.platform == 'android') {

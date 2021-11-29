@@ -106,7 +106,6 @@ export default {
 	computed: {
 		// 展示tabs对应状态的报修列表数据，未完成/已完成
 		currentList() {
-			console.log(this.list && this.list.reduce((prev, item) => prev.concat(item.status == this.tabCurrent.toString() ? item : []), []))
 			return this.list && this.list.reduce((prev, item) => prev.concat(item.status == this.tabCurrent.toString() ? item : []), []);
 		},
 	},
@@ -124,24 +123,10 @@ export default {
 	},
 	created() {
 		let that = this;
-		this.$api('user.findUserAuthority', {
-			openId: uni.getStorageSync('openid')
+		this.$api('afterSale.posterList', {
 		}).then(res => {
-			if (!res.flag) {
-				uni.showToast({
-					title: res.msg || '注册成功',
-					icon: 'success',
-					duration: 2000,
-					mask: true,
-					success: function() {
-						setTimeout(function() {
-							that.$Router.replace({
-								path: '/pages/index/register',
-								query: {}
-							});
-						}, 1000);
-					}
-				});
+			if (res.flag) {
+				that.imagesList = res.data.A
 			}
 		});
 	},
