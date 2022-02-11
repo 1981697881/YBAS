@@ -5,37 +5,52 @@
 		"autoscan": true,
 		"custom": {
 			"app-(.*)": "@/components/app-$1/app-$1.vue",
-			"uni-(.*)": "@/components/uni-$1/uni-$1.vue",
-			"^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue"
+			"^u-(.*)": "_uview-ui@2.0.22@uview-ui/components/u-$1/u-$1.vue"
 		}
 	},
 	"pages": [{
-			"path": "pages/index/index",
-			"name": "home",
-			"aliasPath": "/", //对于h5端你必须在首页加上aliasPath并设置为/
-			"style": {
-				"enablePullDownRefresh": true,
-				"navigationStyle": "custom"
-			},
-			"meta": {
-				"auth": false, //需要登录
-				"async": true //是否同步
-			}
-		},{
-			"path": "pages/index/register",
-			"name": "register",
-			"aliasPath": "/", //对于h5端你必须在首页加上aliasPath并设置为/
-			"style": {
-				"navigationBarTitleText": "注册"
-			},
-			"meta": {
-				"auth": false, //需要登录
-				"async": true //是否同步
-			}
+		"path": "pages/index/index",
+		"name": "home",
+		"aliasPath": "/", //对于h5端你必须在首页加上aliasPath并设置为/
+		"style": {
+			"enablePullDownRefresh": true,
+			"navigationStyle": "custom"
+		},
+		"meta": {
+			"auth": false, //需要登录
+			"async": true //是否同步
 		}
-	],
+	}/* , {
+		"path": "pages/index/register",
+		"name": "register",
+		"aliasPath": "/", //对于h5端你必须在首页加上aliasPath并设置为/
+		"style": {
+			"navigationBarTitleText": "注册"
+		},
+		"meta": {
+			"auth": false, //需要登录
+			"async": true //是否同步
+		}
+	} */],
 	// 分包加载
 	"subPackages": [{
+		"root": "pages/register",
+		"pages": [
+			// 二级页面 start
+			{
+				"path": "register",
+				"name": "register",
+				"aliasPath": "/", //对于h5端你必须在首页加上aliasPath并设置为/
+				"style": {
+					"navigationBarTitleText": "注册"
+				},
+				"meta": {
+					"auth": false, //需要登录
+					"async": true //是否同步
+				}
+			}
+		]
+	},{
 		"root": "pages/detail",
 		"pages": [
 			// 二级页面 start
@@ -45,8 +60,8 @@
 					"navigationBarTitleText": "我要上报"
 				},
 				"meta": {
-				"auth": true, //需要登录
-				"async": true //是否同步
+					"auth": true, //需要登录
+					"async": true //是否同步
 				}
 			},
 			{
@@ -55,8 +70,8 @@
 					"navigationBarTitleText": "我要报修"
 				},
 				"meta": {
-				"auth": true, //需要登录
-				"async": true //是否同步
+					"auth": true, //需要登录
+					"async": true //是否同步
 				}
 			},
 			{
@@ -65,8 +80,8 @@
 					"navigationBarTitleText": "配件查询"
 				},
 				"meta": {
-				"auth": true, //需要登录
-				"async": true //是否同步
+					"auth": true, //需要登录
+					"async": true //是否同步
 				}
 			},
 			{
@@ -75,8 +90,8 @@
 					"navigationBarTitleText": "质保登记"
 				},
 				"meta": {
-				"auth": true, //需要登录
-				"async": true //是否同步
+					"auth": true, //需要登录
+					"async": true //是否同步
 				}
 			},
 			// 二级页面 end
@@ -87,12 +102,12 @@
 					"navigationBarTitleText": "维修费用详情"
 				},
 				"meta": {
-				"auth": true, //需要登录
-				"async": true //是否同步
+					"auth": true, //需要登录
+					"async": true //是否同步
 				}
 			}
 			// 三级页面  end
-			]
+		]
 	}],
 	// 分包预加载规则
 	/* "preloadRule": {

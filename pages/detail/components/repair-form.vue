@@ -77,7 +77,6 @@
 		</block>
 	</view>
 </template>
-
 <script>
 	import {
 		mapMutations,
@@ -87,7 +86,6 @@
 	import mock from '@/common/mock/register';
 	export default {
 		components: {
-
 		},
 		data() {
 			return {

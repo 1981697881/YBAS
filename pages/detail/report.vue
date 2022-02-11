@@ -117,7 +117,7 @@ export default {
 	mounted() {},
 	methods: {
 		// 表单提交
-		submit() {
+		submit() { 
 			let that = this;
 			// 获取表单data，rules
 			const { formData, formRules, customData } = this.$refs['report-form'];
@@ -126,7 +126,7 @@ export default {
 					title: value,
 					mask: true,
 					icon: 'none',
-					duration: 1500
+					duration: 1500 
 				});
 			};
 			// 该页面的formData是Array类型

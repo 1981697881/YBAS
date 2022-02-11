@@ -11,14 +11,13 @@
 		<view class="margin-box">
 			<u-grid :col="3">
 				<!--  -->
-				<u-grid-item v-for="(item, index) in meau" :custom-style="{ padding: '0', textAlign: 'center' }" :key="index">
+				<u-grid-item v-for="(item, index) in meau" bgColor="white" :custom-style="{ padding: '0', textAlign: 'center', borderRight: '1rpx solid #ccc',borderBottom: '1rpx solid #ccc' }" :key="index">
 					<!-- <uni-icons :type="item.icon"></uni-icons> -->
-					<view style="padding: 60rpx 0;"><button v-if="index<4" @tap="jump(item.path,{},index)" class="cu-btn round shadow line-black">{{ item.name }}</button><button v-else open-type="contact" class="cu-btn round shadow line-black">{{ item.name }}</button></view>
+					<view style="padding: 60rpx 0;" ><button v-if="index<4" @tap="jump(item.path,{},index)" class="cu-btn round shadow line-black">{{ item.name }}</button><button v-else open-type="contact" class="cu-btn round shadow line-black">{{ item.name }}</button></view>
 				</u-grid-item>
 			</u-grid>
 		</view>
 		<!-- 菜单入口 end -->
-
 		<!-- 通知 start -->
 		<custom-title title="客服留言">
 			<view class="text-blue"><text style="margin-right: 6rpx;">查看更多</text></view>
@@ -68,7 +67,7 @@
 							<text>{{ item.repairDetailList[item.page].productModel }}</text>
 						</input-box>
 						<input-box label="维修状态">
-							<text>{{ item.repairDetailList[item.page].status | getStatus }}</text>
+							<text>{{ item.status | getStatus }}</text>
 						</input-box>
 					</view>
 					<custom-pagination class="margin-box" :page="item.page" :total="item.repairDetailList.length" @onChange="handlePageChange($event, item)" ></custom-pagination>
@@ -100,13 +99,13 @@ export default {
 			// 报修tab当前选中项目
 			tabCurrent: 0,
 			// 报修数据
-			list: null
+			list: []
 		};
 	},
 	computed: {
 		// 展示tabs对应状态的报修列表数据，未完成/已完成
 		currentList() {
-			return this.list && this.list.reduce((prev, item) => prev.concat(item.status == this.tabCurrent.toString() ? item : []), []);
+			return this.list;
 		},
 	},
 	mounted() {
@@ -114,7 +113,7 @@ export default {
 	},
 	filters: {
 		// 通过传入的status数字值，返回对应的字段出去
-		getStatus: value => ['待发货', '已发货', '已完成'][value || 0] // 控制默认返回下标0的字段
+		getStatus: value => ['待寄回','待检修','待维修','待发货','待收货','完成'][value || 0] // 控制默认返回下标0的字段
 	},
 	// 下拉顶部刷新
 	// 方法留着对接口的时候供参考
@@ -155,7 +154,7 @@ export default {
 								success: function(res) {
 									if (res.confirm) {
 										that.$Router.push({
-											path: '/pages/index/register',
+											path: '/pages/register/register',
 											query: {}
 										});
 									} else if (res.cancel) {
@@ -189,6 +188,12 @@ export default {
 			// 小程序中不支持在组件上通过表达式来动态绑定函数 
 			if(this.tabCurrent === 0){
 				console.log(item)
+				uni.showToast({
+					title: '支付功能暂未开放',
+					mask: true,
+					icon: 'none',
+					duration: 1500
+				});
 			}
 		},
 		// 初始化
@@ -202,6 +207,7 @@ export default {
 			}).then(res => {
 				if (res.flag) {
 					this.list = res.data.map(item => Object.assign(item, { page: 0 }));
+					console.log(this.list)
 				}
 			});
 		}

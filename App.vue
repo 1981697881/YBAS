@@ -93,7 +93,7 @@ export default {
 <style lang="scss">
 @import 'static/colorui/main.css';
 @import 'static/colorui/icon.css';
-@import 'uview-ui/index.scss';
+@import "uview-ui/index.scss";
 
 // 其他scss集成在uni.scss,(变量,class,minix)
 
@@ -123,9 +123,9 @@ uni-checkbox .uni-checkbox-input.uni-checkbox-input-checked{
 	background-color: #007aff;
 }
 
-.primary{
+/* .primary{
 	color: $u-type-primary;
-}
+} */
 
 .text-align{
 	&-left{

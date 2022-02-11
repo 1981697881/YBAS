@@ -103,8 +103,8 @@
 		</view>
 		<!-- 列表end -->
 
-		<!-- 登记界面的弹出层start -->
-		<custom-share :show="shareStatus" title="新增报修单" @close="handleShare" @rtClick="handleScan('edit')">
+		<!-- 登记界面的弹出层start @rtClick="handleScan('edit')"-->
+		<custom-share :show="shareStatus" title="新增报修单" @close="handleShare" >
 			<template slot="title-right">
 				<uni-icons type="scan" color="#808080" size="28"></uni-icons>
 			</template>

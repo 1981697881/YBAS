@@ -187,12 +187,14 @@ export default {
 					console.log('条码类型：' + res.scanType);
 					console.log('条码内容：' + res.result);
 					that.customData.retrievalOrder = res.result
+					that.customData.productPackcode = ""
 					that.$api('afterSale.scanOutPutOrder', {outputOrder: res.result}).then(res => {
 						if (res.flag) {
 							res.data.forEach((item)=>{
 								item.retrievalOrder = that.customData.retrievalOrder
 							})
-							that.formData = [...res.data,...that.formData]
+							/* that.formData = [...res.data,...that.formData] */
+							that.formData = res.data
 							console.log(that.formData)
 						}
 					});
@@ -207,12 +209,14 @@ export default {
 					console.log('条码类型：' + res.scanType);
 					console.log('条码内容：' + res.result);
 					that.customData.productPackcode = res.result
+					that.customData.retrievalOrder = ""
 					that.$api('afterSale.scanPackcode', {packcode: res.result}).then(res => {
 						if (res.flag) {
 							res.data.forEach((item)=>{
 								item.productPackcode = that.customData.productPackcode
 							})
-							that.formData = [...res.data,...that.formData]
+							/* that.formData = [...res.data,...that.formData] */
+							that.formData = res.data
 						}
 					});
 				}
