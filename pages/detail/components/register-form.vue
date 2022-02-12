@@ -33,13 +33,16 @@
 		</input-box>
 		<!-- 支持多选 -->
 		<input-box label="购买凭证" required>
-			<uni-file-picker :auto-upload="false" :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg"
+			<uni-file-picker :auto-upload="false" v-model="item.voucher" :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg"
 				@select="select" @delete="delFile" />
 		</input-box>
 	</view>
 </template>
 
 <script>
+	import {
+		API_URL
+	} from '@/env'
 	import mock from '@/common/mock/register';
 	export default {
 		components: {},
@@ -56,7 +59,7 @@
 					province: '',
 					contactNumber: '',
 					contactAddress: '',
-					certificateFiles: []
+					voucher: []
 				},
 				// 必填项目，对应formData的字段，只需要写“验证提示内容”皆可
 				formRules: {
@@ -64,7 +67,7 @@
 					productBuyDate: '请选择购买日期',
 					contactNumber: '联系电话不能为空',
 					contactAddress: '联系地址不能为空',
-					//certificateFiles: '请上传图片'
+					voucher: '请上传图片'
 				}
 			};
 		},
@@ -102,21 +105,42 @@
 					 
 				 })
 				this.formData.province = str
-				console.log(str)
 				const value = e.detail.value;
 			},
 			onnodeclick(node) {
 			},
 			// 选择文件后触发 - 支持多选
 			select(e) {
+				let that = this
 				// tempFiles - Array[Files]
 				// 控制台查看该组件的files数据类型
-				// console.log('选择文件：', e);
 				e.tempFiles.map((item, index) => {
 					// TODO 根据业务需求修改所需要的数据，以下代码目前用作前端测试用
-					this.formData.certificateFiles.push({
-						file: item.file,
-						uuid: item.uuid
+					uni.uploadFile({
+						url: API_URL + 'file/imgUpload',
+						filePath: item.url,
+						name: 'imgS',
+						header: {
+							Authorization: uni.getStorageSync('token')
+						},
+						success: function(uploadFileRes) {
+							let data = JSON.parse(uploadFileRes.data);
+							that.formData.voucher.push({
+								file: API_URL+data.data,
+								uuid: data.data
+							});
+							uni.showToast({
+								icon: 'success',
+								title: data.msg
+							});
+						},
+						fail: err => {
+							console.log('uploadImage fail', err);
+							uni.showModal({
+								content: err.errMsg,
+								showCancel: false
+							});
+						}
 					});
 				});
 			},
@@ -127,12 +151,12 @@
 					uuid
 				} = e.tempFile;
 				const {
-					certificateFiles
+					voucher
 				} = this.formData;
-				for (let i = 0; i < certificateFiles.length; i++) {
+				for (let i = 0; i < voucher.length; i++) {
 					// 删除对应的file
-					if (certificateFiles[i].uuid === uuid) {
-						certificateFiles.splice(i, 1);
+					if (voucher[i].uuid === uuid) {
+						voucher.splice(i, 1);
 						return;
 					}
 				}

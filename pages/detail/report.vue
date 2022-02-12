@@ -77,7 +77,9 @@
 <script>
 import mock from '@/common/mock/register';
 import reportForm from './components/report-form';
-
+import {
+		API_URL
+	} from '@/env'
 export default {
 	components: {
 		reportForm,
@@ -94,6 +96,7 @@ export default {
 			},
 			// 查找的列表数据
 			list: [],
+			imageUrl: '',
 			// 弹出层
 			shareStatus: false,
 			// 表单是否可编辑
@@ -114,7 +117,9 @@ export default {
 	},
 	watch: {},
 
-	mounted() {},
+	mounted() {
+		this.imageUrl = API_URL
+	},
 	methods: {
 		// 表单提交
 		submit() { 
@@ -130,9 +135,9 @@ export default {
 				});
 			};
 			// 该页面的formData是Array类型
-		
 			for (let i = 0; i < formData.length; i++) {
 				const item = formData[i];
+				formData[i].photos = JSON.stringify(formData[i].photos)
 				for (let key in formRules) {
 					if (typeof item[key] === 'string') {
 						if (item[key] === '') {
@@ -248,6 +253,9 @@ export default {
 			});
 			that.$api('afterSale.reportList', that.searchData).then(res => {
 				if (res.flag) {
+					res.data.forEach((item)=>{
+						item.photos = JSON.parse(item.photos)
+					})
 					uni.hideLoading();
 					that.list = [...res.data];
 				}

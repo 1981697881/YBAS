@@ -63,12 +63,12 @@
 				</input-box>
 				<!-- 支持多选 -->
 				<input-box label="故障图片" v-if="currentPage == index">
-					<uni-file-picker :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg"
+					<uni-file-picker :auto-upload="false" v-model="item.faultPhoto" :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg"
 						@select="select($event, 'fault',item)" @delete="delFile($event, 'fault',item)" />
 				</input-box>
 				<!-- 支持多选 -->
 				<input-box label="购买凭证" v-if="currentPage == index">
-					<uni-file-picker :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg"
+					<uni-file-picker :auto-upload="false" v-model="item.voucher" :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg"
 						@select="select($event, 'certificate',item)" @delete="delFile($event, 'certificate',item)" />
 				</input-box>
 				<button v-if="currentPage == index" class="cu-btn round line-red shadow"
@@ -83,6 +83,9 @@
 		mapActions,
 		mapState
 	} from 'vuex';
+	import {
+		API_URL
+	} from '@/env'
 	import mock from '@/common/mock/register';
 	export default {
 		components: {
@@ -106,8 +109,8 @@
 					productGuarantee: '',
 					faultDescription: '',
 					salesRequirements: 0,
-					faultPhotoArrays: [],
-					voucherArrays: []
+					faultPhoto: [],
+					voucher: []
 				},
 				// 当前页码数
 				currentPage: 0,
@@ -200,22 +203,54 @@
 			
 			// 选择文件后触发 - 支持多选
 			select(e, action, val) {
+				let that = this
 				// tempFiles - Array[Files]
 				// 控制台查看该组件的files数据类型
 				// console.log('选择文件：', e);
 				e.tempFiles.map((item, index) => {
-					console.log(item)
-					if (action === 'fault') {
-						// 故障图片
-						let actionData = val.faultPhotoArrays;
-						actionData.push(item.url);
-					} else if (action === 'certificate') {
-						// 凭证图片
-						let actionData = val.voucherArrays;
-						actionData.push(item.url);
-					}
-					// TODO 根据业务需求修改所需要的数据，以下代码目前用作前端测试用
-					
+					uni.uploadFile({
+						url: API_URL + 'file/imgUpload',
+						filePath: item.url,
+						name: 'imgS',
+						header: {
+							Authorization: uni.getStorageSync('token')
+						},
+						success: function(uploadFileRes) {
+							let data = JSON.parse(uploadFileRes.data);
+							if (action === 'fault') {
+								// 故障图片
+								if(! val.faultPhoto instanceof Array){
+									val.faultPhoto = []
+								}
+								let actionData = val.faultPhoto;
+								actionData.push({
+									file: API_URL+data.data,
+									uuid: data.data
+								});
+							} else if (action === 'certificate') {
+								// 凭证图片
+								if(! val.voucher instanceof Array){
+									val.voucher = []
+								}
+								let actionData = val.voucher;
+								actionData.push({
+									file: API_URL+data.data,
+									uuid: data.data
+								});
+							}
+							uni.showToast({
+								icon: 'success',
+								title: data.msg
+							});
+						},
+						fail: err => {
+							console.log('uploadImage fail', err);
+							uni.showModal({
+								content: err.errMsg,
+								showCancel: false
+							});
+						}
+					});
 				});
 			},
 			// 文件从列表移除时触发
@@ -225,23 +260,22 @@
 					url
 				} = e.tempFile;
 				// 需要操作的目标对象
-				let actionData;
 				if (action === 'fault') {
 					// 故障图片
-					let actionData = val.faultPhotoArrays;
+					let actionData = val.faultPhoto;
 					for (let i = 0; i < actionData.length; i++) {
 						// 删除对应的file
-						if (actionData[i] === uuid) {
+						if (actionData[i].uuid === uuid) {
 							actionData.splice(i, 1);
 							return;
 						}
 					}
 				} else if (action === 'certificate') {
 					// 凭证图片
-					let actionData = val.voucherArrays;
+					let actionData = val.voucher;
 					for (let i = 0; i < actionData.length; i++) {
 						// 删除对应的file
-						if (actionData[i] === url) {
+						if (actionData[i].uuid === url) {
 							actionData.splice(i, 1);
 							return;
 						}

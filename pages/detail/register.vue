@@ -47,8 +47,8 @@
 			</template>
 			<template v-for="(item, index) in list">
 				<uni-collapse :key="index">
-					<uni-collapse-item :title="'产品名称：' + item.productName" 
-						@delete="handleDelList(item, index)"><!-- showDelete -->
+					<uni-collapse-item :title="'产品名称：' + item.productName" @delete="handleDelList(item, index)">
+						<!-- showDelete -->
 						<view class="list-content">
 							<input-box label="产品条码">
 								<text>{{ item.productCode }}</text>
@@ -72,7 +72,16 @@
 								<text>{{ item.contactAddress }}</text>
 							</input-box>
 							<input-box label="购买凭证">
-								<uni-file-picker v-model="item.certificateFiles" readonly />
+								<view class="grid col-3 grid-square flex-sub">
+									<view
+										class="bg-img"
+										v-for="(image,index2) in item.voucher" :key="index2"
+										@tap="ViewImage($event, item)"
+										:data-url="imageUrl+item.voucher[index2].file"
+									>
+										<image :src="imageUrl+item.voucher[index2].file" mode="aspectFill"></image>
+									</view>
+								</view>
 							</input-box>
 						</view>
 					</uni-collapse-item>
@@ -96,7 +105,9 @@
 <script>
 	import mock from '@/common/mock/register';
 	import registerForm from './components/register-form';
-
+	import {
+		API_URL
+	} from '@/env'
 	export default {
 		components: {
 			registerForm
@@ -112,6 +123,7 @@
 					// 购买日期-最小日期
 					productEndBuyDate: null
 				},
+				imageUrl: '',
 				// 查找的列表数据
 				list: [],
 				// 登记界面弹出层
@@ -128,8 +140,16 @@
 		},
 		watch: {},
 
-		mounted() {},
+		mounted() {
+			this.imageUrl = API_URL
+		},
 		methods: {
+			ViewImage(e, item) {
+				uni.previewImage({
+					urls: item.concernsImg,
+					current: e.currentTarget.dataset.url
+				});
+			},
 			// 登记界面的表单提交
 			submit() {
 				let that = this;
@@ -161,6 +181,7 @@
 						}
 					}
 				}
+				formData.voucher = JSON.stringify(formData.voucher);
 				that.$api('afterSale.warrantyAdd', formData).then(res => {
 					if (res.flag) {
 						that.getList();
@@ -201,8 +222,6 @@
 				uni.scanCode({
 					success: function(res) {
 						if (action === 'edit') {
-							console.log('条码类型：' + res.scanType);
-							console.log('条码内容：' + res.result);
 							let resData = res.result.split(';')
 							if (resData.length > 1) {
 								let obj = {}
@@ -260,6 +279,9 @@
 				that.$api('afterSale.warrantyList', that.searchData).then(res => {
 					if (res.flag) {
 						that.isLoading = false;
+						res.data.forEach((item)=>{
+							item.voucher = JSON.parse(item.voucher)
+						})
 						that.list = [...res.data];
 					}
 				});

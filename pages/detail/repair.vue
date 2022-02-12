@@ -105,9 +105,9 @@
 
 		<!-- 登记界面的弹出层start @rtClick="handleScan('edit')"-->
 		<custom-share :show="shareStatus" title="新增报修单" @close="handleShare" >
-			<template slot="title-right">
+			<!-- <template slot="title-right">
 				<uni-icons type="scan" color="#808080" size="28"></uni-icons>
-			</template>
+			</template> -->
 			<template slot="title-footer"></template>
 			<repair-form ref="repair-form" />
 			<template slot="footer">
@@ -189,6 +189,8 @@ export default {
 			// 该页面的formData是Array类型
 			for (let i = 0; i < formData.length; i++) {
 				const item = formData[i];
+				formData[i].voucher = JSON.stringify(formData[i].voucher)
+				formData[i].faultPhoto = JSON.stringify(formData[i].faultPhoto)
 				for (let key in formRules) {
 					if (typeof item[key] === 'string') {
 						if (item[key] === '') {
