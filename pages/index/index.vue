@@ -3,10 +3,9 @@
 	<view class="index-page">
 		<!-- 轮播图 start -->
 		<swiper :indicator-dots="true" :autoplay="false" :interval="3000" :duration="1000" :indicator-active-color="'#ffffff'">
-			<swiper-item v-for="(item, index) in imagesList" :key="index"><image style="width: 100%; height: 100%;" :src="item" mode="scaleToFill"></image></swiper-item>
+			<swiper-item v-for="(item, index) in imagesList" :key="index"><image style="width: 100%; height: 100%;" :src="imageUrl+''+item.posterPhoto" mode="scaleToFill"></image></swiper-item>
 		</swiper>
 		<!-- 轮播图 end -->
-
 		<!-- 菜单入口 start -->
 		<view class="margin-box">
 			<u-grid :col="3">
@@ -84,12 +83,15 @@
 </template>
 <script>
 import mock from '@/common/mock/index';
+import {
+		API_URL
+	} from '@/env'
 import { mapMutations, mapActions, mapState } from 'vuex';
 export default {
 	data() {
 		return {
-			// 最新展品轮播区的测试图
-			imagesList: ['https://picsum.photos/500/300', 'https://picsum.photos/500/300', 'https://picsum.photos/500/300'],
+			// 最新展品轮播区的测试图'https://picsum.photos/500/300', 'https://picsum.photos/500/300', 'https://picsum.photos/500/300'
+			imagesList: [],
 			// 菜单
 			meau: mock.index.meau,
 			// 客服留言
@@ -98,6 +100,7 @@ export default {
 			tabList: ['未完成', '已完成'],
 			// 报修tab当前选中项目
 			tabCurrent: 0,
+			imageUrl: '',
 			// 报修数据
 			list: []
 		};
@@ -122,6 +125,8 @@ export default {
 	},
 	created() {
 		let that = this;
+		this.imageUrl = API_URL.replace("/yingbao","")+'uploadFiles/image/'
+		console.log(this.imageUrl)
 		this.$api('afterSale.posterList', {
 		}).then(res => {
 			if (res.flag) {

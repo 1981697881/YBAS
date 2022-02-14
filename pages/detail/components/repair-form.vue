@@ -39,7 +39,7 @@
 				<input-box label="产品条码" required>
 					<view class="flex align-center">
 						<input class="flex-sub" type="text" v-model="item.productCode" placeholder="请输入或扫描产品包装盒上的条码" />
-						<uni-icons type="scan" color="#808080" @tap="handleScanBarCode(item)"></uni-icons>
+						<uni-icons type="search" color="#808080" @tap="handleScanBarCode(item)"></uni-icons>
 					</view>
 				</input-box>
 				<input-box label="产品名称"><input type="text" v-model="item.productName" disabled /></input-box>
@@ -159,19 +159,28 @@
 		},
 		methods: {
 			...mapActions(['getUserDetails']),
-			handleScanBarCode(item){
-				let that = this;
-				uni.scanCode({
-					success: function(res) {
-						item.productCode = res.result
-						that.$api('afterSale.productionMessage', {productBarcode: res.result}).then(res => {
-							if (res.flag) {
-								item.productName = res.data.productName
-								item.productModel = res.data.productModel
-							}
-						});
-					}
-				});
+			handleScanBarCode(item) {
+				let that = this
+				let resData = item.productCode.split(';')
+				if (resData.length > 1) {
+					item.productName= resData[2];
+					item.productModel= resData[1];
+				} else {
+					that.$api('afterSale.productionMessage', {
+						productBarcode: item.productCode
+					}).then(reso => {
+						if (reso.flag) {
+							let obj = {}
+							item.productName= reso.data.productName;
+							item.productModel= reso.data.productModel;
+						}
+					});
+				}
+			},
+			scanBarcode(obj) {
+				this.formData[this.currentPage].productCode = obj.barCode;
+				this.formData[this.currentPage].productName = obj.name;
+				this.formData[this.currentPage].productModel = obj.model;
 			},
 			delItem(index, item) {
 				let that = this;
@@ -224,7 +233,7 @@
 								}
 								let actionData = val.faultPhoto;
 								actionData.push({
-									file: API_URL+data.data,
+									file: API_URL+'/uploadFiles/image/'+data.data,
 									uuid: data.data
 								});
 							} else if (action === 'certificate') {
@@ -234,7 +243,7 @@
 								}
 								let actionData = val.voucher;
 								actionData.push({
-									file: API_URL+data.data,
+									file: API_URL+'/uploadFiles/image/'+data.data,
 									uuid: data.data
 								});
 							}
@@ -252,6 +261,7 @@
 						}
 					});
 				});
+				console.log(val)
 			},
 			// 文件从列表移除时触发
 			delFile(e, action, val) {

@@ -3,9 +3,9 @@
  *  @version 1.2.0
  */
 const ENV_BASE_URL = {
-	development: 'http://192.168.31.100:10008', //开发环境
+	development: 'https://yb.gzfzdev.com/yingbao', //开发环境
 	/* development: 'https://yb.gzfzdev.com/yingbao', *///开发环境
-	production: 'http://192.168.31.100:10008', //生产环境
+	production: 'https://yb.gzfzdev.com/yingbao', //生产环境
 }
 const ENV_API_URL = {
 	development: `${ENV_BASE_URL.development}/`, //开发环境

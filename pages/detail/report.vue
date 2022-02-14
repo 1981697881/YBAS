@@ -118,7 +118,7 @@ export default {
 	watch: {},
 
 	mounted() {
-		this.imageUrl = API_URL
+		this.imageUrl = API_URL+'/uploadFiles/image/'
 	},
 	methods: {
 		// 表单提交

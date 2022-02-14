@@ -160,7 +160,7 @@
 						success: function(uploadFileRes) {
 							let data = JSON.parse(uploadFileRes.data);
 							val.photos.push({
-								file: API_URL+data.data,
+								file: API_URL+'/uploadFiles/image/'+data.data,
 								uuid: data.data
 							});
 							uni.showToast({

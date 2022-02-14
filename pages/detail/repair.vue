@@ -103,11 +103,11 @@
 		</view>
 		<!-- 列表end -->
 
-		<!-- 登记界面的弹出层start @rtClick="handleScan('edit')"-->
-		<custom-share :show="shareStatus" title="新增报修单" @close="handleShare" >
-			<!-- <template slot="title-right">
+		<!-- 登记界面的弹出层start -->
+		<custom-share :show="shareStatus" title="新增报修单" @close="handleShare" @rtClick="handleScan('edit')">
+			<template slot="title-right">
 				<uni-icons type="scan" color="#808080" size="28"></uni-icons>
-			</template> -->
+			</template>
 			<template slot="title-footer"></template>
 			<repair-form ref="repair-form" />
 			<template slot="footer">
@@ -267,7 +267,30 @@ export default {
 			uni.scanCode({
 				success: function(res) {
 					if (action === 'edit') {
-						
+						let resData = res.result.split(';')
+						if (resData.length > 1) {
+							let obj = {}
+							obj.name = resData[2];
+							obj.model = resData[1];
+							obj.barCode = res.result;
+							that.$nextTick(function() {
+								that.$refs['repair-form'].scanBarcode(obj);
+							})
+						} else {
+							that.$api('afterSale.productionMessage', {
+								productBarcode: res.result
+							}).then(reso => {
+								if (reso.flag) {
+									let obj = {}
+									obj.name = reso.data.productName;
+									obj.model = reso.data.productModel;
+									obj.barCode = res.result;
+									that.$nextTick(function() {
+										that.$refs['repair-form'].scanBarcode(obj);
+									})
+								}
+							});
+						}
 						// 在登记界面点击的扫描图标
 					} else {
 						that.searchData.barCode = res.result;

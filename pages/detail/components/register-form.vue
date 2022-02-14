@@ -8,34 +8,40 @@
 -->
 <template>
 	<view style="padding: 32rpx 0;">
-		<input-box label="产品条码" required><input type="text" v-model="formData.productCode"
-				placeholder="请输入或扫描产品包装盒上的条码" /></input-box>
-		<input-box label="产品名称"><input type="text" v-model="formData.productName" disabled /></input-box>
-		<input-box label="产品型号"><input type="text" v-model="formData.productModel" disabled /></input-box>
-		<input-box label="购买日期" required>
-			<picker mode="date" v-model="formData.bounghtDate" @change="handleBounghtDateChange">
-				<view class="flex align-center"><input type="text" disabled v-model="formData.productBuyDate"
-						class="flex-sub" placeholder="请选择日期" /></view>
-			</picker>
-		</input-box>
-		<input-box label="保修期至"><input type="text" v-model="formData.productGuarantee" class="flex-sub" disabled
-				placeholder="自动计算,最少一年" /></input-box>
-		<input-box label="省市区">
-			<!-- <input type="text" v-model="formData.provinceCity" placeholder="请填写省份市区" /> -->
-			<uni-data-picker placeholder="请选择地址" popup-title="请选择城市" :preload="true" :step-searh="true"
-				self-field="code" parent-field="parent_code" collection="opendb-city-china" orderby="value asc"
-				field="code as value, name as text, eq(['$type', 2]) as isleaf" 
-				 @change="onchange" @nodeclick="onnodeclick"></uni-data-picker>
-		</input-box>
-		<input-box label="联系电话"><input type="text" v-model="formData.contactNumber" placeholder="请输入电话或座机号码" />
-		</input-box>
-		<input-box label="联系地址"><input type="text" v-model="formData.contactAddress" placeholder="请输入联系地址" />
-		</input-box>
-		<!-- 支持多选 -->
-		<input-box label="购买凭证" required>
-			<uni-file-picker :auto-upload="false" v-model="item.voucher" :limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg"
-				@select="select" @delete="delFile" />
-		</input-box>
+		<view class="address-warpper">
+			<input-box label="产品条码" required>
+				<view class="flex align-center">
+					<input class="flex-sub" type="text" v-model="formData.productCode" placeholder="请输入或扫描产品包装盒上的条码" />
+					<uni-icons type="search" color="#808080" @tap="handleScanBarCode"></uni-icons>
+				</view>
+			</input-box>
+			<input-box label="产品名称"><input type="text" v-model="formData.productName" disabled /></input-box>
+			<input-box label="产品型号"><input type="text" v-model="formData.productModel" disabled /></input-box>
+			<input-box label="购买日期" required>
+				<picker mode="date" v-model="formData.bounghtDate" @change="handleBounghtDateChange">
+					<view class="flex align-center"><input type="text" disabled v-model="formData.productBuyDate"
+							class="flex-sub" placeholder="请选择日期" /></view>
+				</picker>
+			</input-box>
+			<input-box label="保修期至"><input type="text" v-model="formData.productGuarantee" class="flex-sub" disabled
+					placeholder="自动计算,最少一年" /></input-box>
+			<input-box label="省市区">
+				<!-- <input type="text" v-model="formData.provinceCity" placeholder="请填写省份市区" /> -->
+				<uni-data-picker placeholder="请选择地址" popup-title="请选择城市" :preload="true" :step-searh="true"
+					self-field="code" parent-field="parent_code" collection="opendb-city-china" orderby="value asc"
+					field="code as value, name as text, eq(['$type', 2]) as isleaf" @change="onchange"
+					@nodeclick="onnodeclick"></uni-data-picker>
+			</input-box>
+			<input-box label="联系电话"><input type="text" v-model="formData.contactNumber" placeholder="请输入电话或座机号码" />
+			</input-box>
+			<input-box label="联系地址"><input type="text" v-model="formData.contactAddress" placeholder="请输入联系地址" />
+			</input-box>
+			<!-- 支持多选 -->
+			<input-box label="购买凭证" required>
+				<uni-file-picker :auto-upload="false" v-model="item.voucher" :limit="3" file-mediatype="image"
+					mode="grid" file-extname="png,jpg" @select="select" @delete="delFile" />
+			</input-box>
+		</view>
 	</view>
 </template>
 
@@ -88,6 +94,29 @@
 		},
 		mounted: function() {},
 		methods: {
+			handleScanBarCode() {
+				let that = this
+				let resData = that.formData.productCode.split(';')
+				if (resData.length > 1) {
+					let obj = {}
+					obj.name = resData[2];
+					obj.model = resData[1];
+					obj.barCode = that.formData.productCode;
+					that.scanBarcode(obj);
+				} else {
+					that.$api('afterSale.productionMessage', {
+						productBarcode: that.formData.productCode
+					}).then(reso => {
+						if (reso.flag) {
+							let obj = {}
+							obj.name = reso.data.productName;
+							obj.model = reso.data.productModel;
+							obj.barCode = this.formData.productCode;
+							that.scanBarcode(obj);
+						}
+					});
+				}
+			},
 			scanBarcode(obj) {
 				this.formData.productCode = obj.barCode;
 				this.formData.productName = obj.name;
@@ -96,19 +125,18 @@
 			onchange(e) {
 				console.log(e)
 				let str = "";
-				 e.detail.value.forEach((item,index)=>{
-					 if(index == 0){
-						 str = item.text
-					 }else{
-						str = str+ "/"+item.text
-					 }
-					 
-				 })
+				e.detail.value.forEach((item, index) => {
+					if (index == 0) {
+						str = item.text
+					} else {
+						str = str + "/" + item.text
+					}
+
+				})
 				this.formData.province = str
 				const value = e.detail.value;
 			},
-			onnodeclick(node) {
-			},
+			onnodeclick(node) {},
 			// 选择文件后触发 - 支持多选
 			select(e) {
 				let that = this
@@ -126,7 +154,7 @@
 						success: function(uploadFileRes) {
 							let data = JSON.parse(uploadFileRes.data);
 							that.formData.voucher.push({
-								file: API_URL+data.data,
+								file: API_URL + '/uploadFiles/image/' + data.data,
 								uuid: data.data
 							});
 							uni.showToast({
@@ -169,4 +197,19 @@
 	};
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+	.address-warpper {
+		// border-bottom: 2rpx #cccccc dashed;
+	}
+	
+	.form-warpper {
+		overflow-y: scroll;
+		max-height: 300px;
+	}
+	
+	.pagination-warpper {
+		padding: 16rpx 0;
+		margin-bottom: 16rpx;
+		border-bottom: 2rpx #dddddd solid;
+	}
+</style>
