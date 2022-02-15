@@ -34,9 +34,9 @@
 			<template v-for="(item, index) in list">
 				<uni-collapse :key="index">
 					<uni-collapse-item :title="'产品名称：' + item.productName" showDelete @delete="handleDelList(item, index)">
-						<template slot="title-right">
+						<!-- <template slot="title-right">
 							<view class="text-grey">2021/8/1/</view>
-						</template>
+						</template> -->
 						<view class="list-content" @click="handleShare(true, 'readonly', item)">
 							<input-box label="产品条码">
 								<text>{{ item.productBarcode }}</text>
@@ -47,6 +47,9 @@
 							<input-box label="详情"><text class="text-blue" style="text-decoration: underline">点击查看详情</text></input-box>
 							<input-box label="处理状态">
 								<text>{{ item.status | filterStatus }}</text>
+							</input-box>
+							<input-box label="上报时间">
+								<text>{{ item.createDate }}</text>
 							</input-box>
 						</view>
 					</uni-collapse-item>
@@ -96,7 +99,6 @@ export default {
 			},
 			// 查找的列表数据
 			list: [],
-			imageUrl: '',
 			// 弹出层
 			shareStatus: false,
 			// 表单是否可编辑
@@ -118,7 +120,6 @@ export default {
 	watch: {},
 
 	mounted() {
-		this.imageUrl = API_URL+'/uploadFiles/image/'
 	},
 	methods: {
 		// 表单提交

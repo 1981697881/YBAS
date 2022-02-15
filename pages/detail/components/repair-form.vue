@@ -39,7 +39,7 @@
 				<input-box label="产品条码" required>
 					<view class="flex align-center">
 						<input class="flex-sub" type="text" v-model="item.productCode" placeholder="请输入或扫描产品包装盒上的条码" />
-						<uni-icons type="search" color="#808080" @tap="handleScanBarCode(item)"></uni-icons>
+						<uni-icons type="search" size="20" color="#808080" @tap="handleScanBarCode(item)"></uni-icons>
 					</view>
 				</input-box>
 				<input-box label="产品名称"><input type="text" v-model="item.productName" disabled /></input-box>
@@ -101,6 +101,7 @@
 				},
 				// 产品表单数据源
 				formData: [],
+				imageUrl: '',
 				formDataCopy: {
 					productCode: '',
 					productName: '',
@@ -149,6 +150,7 @@
 			}
 		},
 		created: function() {
+			this.imageUrl = API_URL.replace("/yingbao","")+'uploadFiles/image/'
 			// 将副本字段引用到表单data中
 			// 需要深拷贝，不然.push = 引用this.formDataCopy
 			/* this.formData.push(JSON.parse(JSON.stringify(this.formDataCopy))) */
@@ -162,7 +164,16 @@
 			handleScanBarCode(item) {
 				let that = this
 				let resData = item.productCode.split(';')
-				if (resData.length > 1) {
+				that.$api('afterSale.productionMessage', {
+					productBarcode: item.productCode
+				}).then(reso => {
+					if (reso.flag) {
+						let obj = {}
+						item.productName= reso.data.productName;
+						item.productModel= reso.data.productModel;
+					}
+				});
+				/* if (resData.length > 1) {
 					item.productName= resData[2];
 					item.productModel= resData[1];
 				} else {
@@ -175,7 +186,7 @@
 							item.productModel= reso.data.productModel;
 						}
 					});
-				}
+				} */
 			},
 			scanBarcode(obj) {
 				this.formData[this.currentPage].productCode = obj.barCode;
@@ -233,7 +244,7 @@
 								}
 								let actionData = val.faultPhoto;
 								actionData.push({
-									file: API_URL+'/uploadFiles/image/'+data.data,
+									path: that.imageUrl+data.data,
 									uuid: data.data
 								});
 							} else if (action === 'certificate') {
@@ -243,7 +254,7 @@
 								}
 								let actionData = val.voucher;
 								actionData.push({
-									file: API_URL+'/uploadFiles/image/'+data.data,
+									path: that.imageUrl+data.data,
 									uuid: data.data
 								});
 							}

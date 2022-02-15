@@ -14,14 +14,14 @@
 				<view class="flex align-center">
 					<input class="flex-sub" type="text" v-model="customData.retrievalOrder" placeholder="请输入或扫描出库单号"
 						:disabled="!isEdit" />
-					<uni-icons type="scan" color="#808080" @tap="handleScanOut"></uni-icons>
+					<uni-icons type="scan" size="20" color="#808080" @tap="handleScanOut"></uni-icons>
 				</view>
 			</input-box>
 			<input-box label="装箱码">
 				<view class="flex align-center">
 					<input class="flex-sub" type="text" v-model="customData.productPackcode" placeholder="请输入或扫描装箱码"
 						:disabled="!isEdit" />
-					<uni-icons type="scan" color="#808080" @tap="handleScanInbox"></uni-icons>
+					<uni-icons type="scan" size="20" color="#808080" @tap="handleScanInbox"></uni-icons>
 				</view>
 			</input-box>
 		</view>
@@ -40,7 +40,7 @@
 					<view class="flex align-center">
 						<input class="flex-sub" type="text" v-model="item.productBarcode" placeholder="请输入或扫描产品包装盒上的条码"
 							:disabled="!isEdit" />
-						<uni-icons v-if="isEdit" type="scan" color="#808080" @tap="handleScanBarCode(item)"></uni-icons>
+						<uni-icons v-if="isEdit" size="20" type="scan" color="#808080" @tap="handleScanBarCode(item)"></uni-icons>
 					</view>
 				</input-box>
 				<input-box label="产品名称"><input type="text" v-model="item.productName" placeholder="根据条码自动填充" disabled />
@@ -50,7 +50,7 @@
 			</view>
 			<!-- 支持多选 -->
 			<input-box label="相关图片" v-if="currentPage == index">
-				<uni-file-picker :auto-upload="false" v-model="item.photos" :disabled="!isEdit" :limit="3" file-mediatype="image"
+				<uni-file-picker :readonly="!isEdit" :auto-upload="false" v-model="item.photos" :disabled="!isEdit" :limit="3" file-mediatype="image"
 					mode="grid" file-extname="png,jpg" @select="select($event, 'fault',item)"
 					@delete="delFile($event, 'fault',item)" />
 			</input-box>
@@ -122,6 +122,7 @@
 			}
 		},
 		created: function() {
+			this.imageUrl = API_URL.replace("/yingbao","")+'uploadFiles/image/'
 			// 将副本字段引用到表单data中
 			// 需要深拷贝，不然.push = 引用this.formDataCopy
 			//this.formData.push(JSON.parse(JSON.stringify(this.formDataCopy)))
@@ -160,7 +161,7 @@
 						success: function(uploadFileRes) {
 							let data = JSON.parse(uploadFileRes.data);
 							val.photos.push({
-								file: API_URL+'/uploadFiles/image/'+data.data,
+								path: that.imageUrl+data.data,
 								uuid: data.data
 							});
 							uni.showToast({
@@ -270,7 +271,17 @@
 				uni.scanCode({
 					success: function(res) {
 						let resData = res.result.split(';')
-						if (resData.length > 1) {
+						that.$api('afterSale.productionMessage', {
+							productBarcode: res.result
+						}).then(reso => {
+							if (reso.flag) {
+								let obj = {}
+								item.productName = reso.data.productName;
+								item.productModel = reso.data.productModel;
+								item.productBarcode = res.result;
+							}
+						});
+						/* if (resData.length > 1) {
 							let obj = {}
 							item.productName = resData[2];
 							item.productModel = resData[1];
@@ -286,7 +297,7 @@
 									item.productBarcode = res.result;
 								}
 							});
-						}
+						} */
 					}
 				});
 			},

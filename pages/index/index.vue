@@ -71,7 +71,7 @@
 					</view>
 					<custom-pagination class="margin-box" :page="item.page" :total="item.repairDetailList.length" @onChange="handlePageChange($event, item)" ></custom-pagination>
 					<view class="btn-warpper text-center">
-						<text :class="tabCurrent === 0 ? 'text-blue':'text-grey'" @click="doPay(item)">支付维修费用：{{ item.status>=3? '￥'+item.payPrice: "未完成" }}</text>
+						<text :class="tabCurrent === 0 ? 'text-blue':'text-grey'" @click="doPay(item)">维修费用：{{ item.status>=3? '￥'+item.payPrice: "未完成" }}</text>
 					</view>
 				</uni-collapse-item>
 			</uni-collapse>

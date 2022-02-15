@@ -12,7 +12,7 @@
 			<input-box label="产品条码" required>
 				<view class="flex align-center">
 					<input class="flex-sub" type="text" v-model="formData.productCode" placeholder="请输入或扫描产品包装盒上的条码" />
-					<uni-icons type="search" color="#808080" @tap="handleScanBarCode"></uni-icons>
+					<uni-icons type="search" size="20" color="#808080" @tap="handleScanBarCode"></uni-icons>
 				</view>
 			</input-box>
 			<input-box label="产品名称"><input type="text" v-model="formData.productName" disabled /></input-box>
@@ -92,12 +92,25 @@
 				console.log(value);
 			}
 		},
-		mounted: function() {},
+		mounted: function() {
+			this.imageUrl = API_URL.replace("/yingbao","")+'uploadFiles/image/'
+		},
 		methods: {
 			handleScanBarCode() {
 				let that = this
 				let resData = that.formData.productCode.split(';')
-				if (resData.length > 1) {
+				that.$api('afterSale.productionMessage', {
+					productBarcode: that.formData.productCode
+				}).then(reso => {
+					if (reso.flag) {
+						let obj = {}
+						obj.name = reso.data.productName;
+						obj.model = reso.data.productModel;
+						obj.barCode = this.formData.productCode;
+						that.scanBarcode(obj);
+					}
+				});
+				/* if (resData.length > 1) {
 					let obj = {}
 					obj.name = resData[2];
 					obj.model = resData[1];
@@ -115,7 +128,7 @@
 							that.scanBarcode(obj);
 						}
 					});
-				}
+				} */
 			},
 			scanBarcode(obj) {
 				this.formData.productCode = obj.barCode;
@@ -154,7 +167,7 @@
 						success: function(uploadFileRes) {
 							let data = JSON.parse(uploadFileRes.data);
 							that.formData.voucher.push({
-								file: API_URL + '/uploadFiles/image/' + data.data,
+								path: that.imageUrl + data.data,
 								uuid: data.data
 							});
 							uni.showToast({
