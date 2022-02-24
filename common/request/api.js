@@ -61,6 +61,11 @@ export default {
 			auth: true,
 			method: 'POST',
 			// desc: '维修',
+		},receiving: {
+			url: 'logistics/receiving',
+			auth: true,
+			method: 'POST',
+			// desc: '确认收货',
 		},
 		seriesList: {
 			url: 'partsList/seriesList',

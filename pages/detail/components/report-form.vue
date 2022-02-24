@@ -272,7 +272,8 @@
 					success: function(res) {
 						let resData = res.result.split(';')
 						that.$api('afterSale.productionMessage', {
-							productBarcode: res.result
+							productBarcode: res.result,
+							status: 0,
 						}).then(reso => {
 							if (reso.flag) {
 								let obj = {}

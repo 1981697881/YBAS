@@ -15,7 +15,7 @@
 				<view class="flex-sub flex align-center">
 					<picker mode="date" :value="searchData.productStartBuyDate" @change="bindMaxDateChange">
 						<view class="flex align-center">
-							<input type="text" v-model="searchData.productStartBuyDate" class="flex-sub"
+							<input type="text" disabled v-model="searchData.productStartBuyDate" class="flex-sub"
 								placeholder="开始日期" />
 							<!-- <text v-if="maxDate" class="text-clear text-blue">清空</text> -->
 							<text v-if="searchData.productStartBuyDate" class="text-clear cuIcon-backdelete"
@@ -24,7 +24,7 @@
 					</picker>
 					<picker mode="date" :value="searchData.productEndBuyDate" @change="bindMinDateChange">
 						<view class="flex align-center">
-							<input type="text" v-model="searchData.productEndBuyDate" class="flex-sub"
+							<input type="text" disabled v-model="searchData.productEndBuyDate" class="flex-sub"
 								placeholder="结束日期" />
 							<!-- <text v-if="minDate" class="text-clear text-blue">清空</text> -->
 							<text v-if="searchData.productEndBuyDate" class="text-clear cuIcon-backdelete"
@@ -33,7 +33,7 @@
 					</picker>
 				</view>
 			</view>
-			<view class="input-box text-blue text-center" @click="getList">查找</view>
+			<view class="input-box text-blue text-center" style="border-top: 1px solid #ccc;border-bottom: 1px solid #ccc;" @click="getList">查找</view>
 		</view>
 		<!-- 搜索条件end -->
 		<!-- 列表start -->
@@ -84,7 +84,7 @@
 		<!-- 登记界面的弹出层start -->
 		<custom-share :show="shareStatus" title="新增登记" @close="handleShare" @rtClick="handleScan('edit')">
 			<template slot="footer">
-				<view class="share-footer text-blue" @click="submit">提交</view>
+				<view class="share-footer bg-blue" style="height: 90rpx;" @click="submit">提交</view>
 			</template>
 			<template slot="title-right">
 				<uni-icons type="scan" color="#808080" size="28"></uni-icons>

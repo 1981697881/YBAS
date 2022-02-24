@@ -7,19 +7,19 @@
 				<view class="flex-sub flex align-center">
 					<picker mode="date" :value="searchData.startDate" @change="handleMaxDateChange">
 						<view class="flex align-center">
-							<input type="text" v-model="searchData.startDate" class="flex-sub" placeholder="开始日期" />
+							<input type="text" disabled v-model="searchData.startDate" class="flex-sub" placeholder="开始日期" />
 							<text v-if="searchData.startDate" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.startDate')"></text>
 						</view>
 					</picker>
 					<picker mode="date" :value="searchData.endDate" @change="handleMinDateChange">
 						<view class="flex align-center">
-							<input type="text" v-model="searchData.endDate" class="flex-sub" placeholder="结束日期" />
+							<input type="text" disabled v-model="searchData.endDate" class="flex-sub" placeholder="结束日期" />
 							<text v-if="searchData.endDate" class="text-clear cuIcon-backdelete" @click.stop="handleSearchClear('searchData.endDate')"></text>
 						</view>
 					</picker>
 				</view>
 			</view>
-			<view class="input-box text-blue text-center" @click="getList">查找</view>
+			<view class="input-box text-blue text-center" style="border-top: 1px solid #ccc;border-bottom: 1px solid #ccc;" @click="getList">查找</view>
 		</view>
 		<!-- 搜索条件end -->
 
@@ -66,7 +66,7 @@
 				</template>
 				<report-form ref="report-form" :isEdit="isEdit"/>
 				<template slot="footer" v-if="isEdit">
-					<view class="flex">
+					<view class="flex" style="height: 90rpx;">
 						<text class="flex-sub share-footer text-white bg-blue cuIcon-add" @click="addformData">追加产品</text>
 						<view class="flex-sub share-footer text-blue" @click="submit">提交</view>
 					</view>

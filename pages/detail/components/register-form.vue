@@ -73,7 +73,6 @@
 					productBuyDate: '请选择购买日期',
 					contactNumber: '联系电话不能为空',
 					contactAddress: '联系地址不能为空',
-					voucher: '请上传图片'
 				}
 			};
 		},

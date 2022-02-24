@@ -13,8 +13,8 @@
 			<!-- 表单 -->
 			<view class="login-box y-f">
 				<view class="input-item x-c">
-					<text class="inp-title">内&emsp;码</text>
-					<input class="inp" v-model="employeeInternalCode" type="number" placeholder="请输入编码" placeholder-class="pl" />
+					<text class="inp-title">编&emsp;码</text>
+					<input class="inp" v-model="employeeCode" type="number" placeholder="请输入编码" placeholder-class="pl" />
 				</view>
 				<view class="input-item x-c">
 					<text class="inp-title">密&emsp;码</text>
@@ -32,7 +32,7 @@ import Wechat from '@/common/wechat/wechat'
 export default {
 	data() {
 		return {
-			employeeInternalCode: '',
+			employeeCode: '',
 			employeePassword: '',
 			sysInfo: uni.getStorageSync('sysInfo')
 		};
@@ -76,7 +76,7 @@ export default {
 			let that = this;
 			if (that.userInfo) {
 				that.$api('afterSale.bindingEmployee', {
-					employeeInternalCode: that.employeeInternalCode,
+					employeeCode: that.employeeCode,
 					employeePassword: that.employeePassword
 				}).then(res => {
 					if (res.flag) {

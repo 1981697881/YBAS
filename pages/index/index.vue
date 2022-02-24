@@ -66,7 +66,7 @@
 							<text>{{ item.repairDetailList[item.page].productModel }}</text>
 						</input-box>
 						<input-box label="维修状态">
-							<text>{{ item.status | getStatus }}</text>
+							<text>{{ item.status | getStatus }}</text><button style="width: 150rpx;float: right;" v-if="item.status==4" class="text-blue" @click="confirmReceipt(item)">确认收货</button>
 						</input-box>
 					</view>
 					<custom-pagination class="margin-box" :page="item.page" :total="item.repairDetailList.length" @onChange="handlePageChange($event, item)" ></custom-pagination>
@@ -200,6 +200,49 @@ export default {
 					duration: 1500
 				});
 			}
+		},
+		confirmReceipt(item){
+			let that = this
+			// 确认收货
+			that.$api('afterSale.receiving', {
+				repairOrder: item.repairOrder,
+				receivingDate: that.getDay('', 0).date
+			}).then(res => {
+				if (res.flag) {
+					uni.showToast({
+						title: res.msg,
+						mask: true,
+						icon: 'success',
+						duration: 1500
+					});
+					that.init();
+				}
+			});
+		},
+		getDay(date, day) {
+			var today = new Date();
+			var targetday_milliseconds = today.getTime() + 1000 * 60 * 60 * 24 * day;
+			today.setTime(targetday_milliseconds); //注意，这行是关键代码
+			var tYear = today.getFullYear();
+			var tMonth = today.getMonth();
+			var tDate = today.getDate();
+			var getDay = today.getDay();
+			tMonth = this.doHandleMonth(tMonth + 1);
+			tDate = this.doHandleMonth(tDate);
+			var weeks = new Array('星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六');
+			var week = weeks[getDay];
+			return {
+				day: tDate,
+				week: week,
+				date: tYear + '-' + tMonth + '-' + tDate
+			};
+		},
+		doHandleMonth(month) {
+			var m = month;
+			if (month.toString().length == 1) {
+				m = '0' + month;
+			}
+			return m;
 		},
 		// 初始化
 		init() {

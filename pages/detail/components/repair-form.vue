@@ -7,7 +7,7 @@
  * @LastEditTime: 2021-09-14 22:51:09
 -->
 <template>
-	<view style="padding: 32rpx 0;">
+	<view>
 		<!-- 维修联系人及单号start -->
 		<view class="address-warpper">
 			<input-box label="维修单号">
@@ -46,13 +46,13 @@
 				<input-box label="产品型号"><input type="text" v-model="item.productModel" disabled /></input-box>
 				<input-box label="购买日期" required>
 					<picker mode="date" v-model="item.productBuyDate" @change="handleBounghtDateChange($event,item)">
-						<view class="flex align-center"><input type="text" v-model="item.productBuyDate"
+						<view class="flex align-center"><input type="text"  disabled v-model="item.productBuyDate"
 								class="flex-sub" placeholder="请选择日期" /></view>
 					</picker>
 				</input-box>
 				<input-box label="保修期至"><input type="text" v-model="item.productGuarantee" class="flex-sub" disabled
 						placeholder="自动计算,最少一年" /></input-box>
-				<input-box label="故障说明"><textarea v-model="item.faultDescription" placeholder="填写故障说明" /></input-box>
+				<input-box label="故障说明"><textarea style="width: auto;" v-model="item.faultDescription" placeholder="填写故障说明" /></input-box>
 				<input-box label="售后要求" required>
 					<picker v-model="item.salesRequirements" :range="afterSalesList" @change="handleAfterSales($event,item)">
 						<view class="flex">

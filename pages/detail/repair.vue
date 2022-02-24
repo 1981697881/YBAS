@@ -3,13 +3,13 @@
 	<view>
 		<!-- 搜索条件start -->
 		<view class="title-warpper">
-			<view class="input-box flex">
+			<!-- <view class="input-box flex">
 				<text class="input-label">产品条码</text>
 				<input type="text" v-model="searchData.barCode" class="flex-sub" placeholder="请手动输入或者扫描" />
 				<text v-if="searchData.barCode" class="text-clear cuIcon-backdelete"
 					@click.stop="handleSearchClear('searchData.barCode')"></text>
 				<uni-icons type="scan" color="#808080" size="28" @click="handleScan"></uni-icons>
-			</view>
+			</view> -->
 			<view class="input-box flex">
 				<text class="input-label">维修单号</text>
 				<input type="text" v-model="searchData.repairOrder" class="flex-sub" placeholder="请手动输入" />
@@ -21,7 +21,7 @@
 				<view class="flex-sub flex align-center">
 					<picker mode="date" :value="searchData.startDate" @change="handleMaxDateChange">
 						<view class="flex align-center">
-							<input type="text" v-model="searchData.startDate" class="flex-sub" placeholder="开始日期" />
+							<input type="text" disabled v-model="searchData.startDate" class="flex-sub" placeholder="开始日期" />
 							<!-- <text v-if="startDate" class="text-clear text-blue">清空</text> -->
 							<text v-if="searchData.startDate" class="text-clear cuIcon-backdelete"
 								@click.stop="handleSearchClear('searchData.startDate')"></text>
@@ -29,7 +29,7 @@
 					</picker>
 					<picker mode="date" :value="searchData.endDate" @change="handleMinDateChange">
 						<view class="flex align-center">
-							<input type="text" v-model="searchData.endDate" class="flex-sub" placeholder="结束日期" />
+							<input type="text" disabled v-model="searchData.endDate" class="flex-sub" placeholder="结束日期" />
 							<!-- <text v-if="endDate" class="text-clear text-blue">清空</text> -->
 							<text v-if="searchData.endDate" class="text-clear cuIcon-backdelete"
 								@click.stop="handleSearchClear('searchData.endDate')"></text>
@@ -37,7 +37,7 @@
 					</picker>
 				</view>
 			</view>
-			<view class="input-box text-blue text-center" @click="getList">查找</view>
+			<view class="input-box text-blue text-center" style="border-top: 1px solid #ccc;border-bottom: 1px solid #ccc;" @click="getList">查找</view>
 		</view>
 		<!-- 搜索条件end -->
 
@@ -128,7 +128,7 @@
 			<template slot="title-footer"></template>
 			<repair-form ref="repair-form" />
 			<template slot="footer">
-				<view class="flex">
+				<view class="flex" style="height: 90rpx;">
 					<text class="flex-sub share-footer text-white bg-blue cuIcon-add" @tap="add">追加产品</text>
 					<view class="flex-sub share-footer text-blue" @click="submit">提交</view>
 				</view>
