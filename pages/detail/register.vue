@@ -33,19 +33,25 @@
 					</picker>
 				</view>
 			</view>
-			<view class="input-box text-blue text-center" style="border-top: 1px solid #ccc;border-bottom: 1px solid #ccc;" @click="getList">查找</view>
+			<view class="input-box text-blue text-center"
+				style="border-top: 1px solid #ccc;border-bottom: 1px solid #ccc;" @click="getList">查找</view>
 		</view>
 		<!-- 搜索条件end -->
 		<!-- 列表start -->
 		<view class="list-warpper">
 			<view class="input-box" style="background: inherit;font-size:26rpx;">
-				<view class="flex"><text class="flex-sub text-blue text-right cuIcon-add"
-						@click="handleShare(true, 'edit')">登记</text></view>
+				<view class=" text-right"><button @click="handleShare(true, 'edit')" style="width: 100rpx;"
+						class="bg-blue cu-btn cuIcon ">登记
+						<text class="cuIcon-add"></text>
+					</button>
+					<!-- <text class="flex-sub text-blue text-right cuIcon-add"
+						>登记</text> -->
+				</view>
 			</view>
 			<template v-if="list.length === 0">
 				<view class="text-center text-grey">暂无数据，请重新查找</view>
 			</template>
-			<template v-for="(item, index) in list" >
+			<template v-for="(item, index) in list">
 				<uni-collapse :key="index">
 					<uni-collapse-item :title="'产品名称：' + item.productName" @delete="handleDelList(item, index)">
 						<!-- showDelete -->
@@ -72,8 +78,8 @@
 								<text>{{ item.contactAddress }}</text>
 							</input-box>
 							<input-box label="购买凭证">
-								<uni-file-picker v-if="item.voucher.length>0" readonly=true :value="item.voucher" :limit="3" file-mediatype="image"
-									mode="grid" file-extname="png,jpg" />
+								<uni-file-picker v-if="item.voucher.length>0" readonly=true :value="item.voucher"
+									:limit="3" file-mediatype="image" mode="grid" file-extname="png,jpg" />
 							</input-box>
 						</view>
 					</uni-collapse-item>

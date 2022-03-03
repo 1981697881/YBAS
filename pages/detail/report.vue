@@ -25,8 +25,13 @@
 
 		<!-- 列表start -->
 		<view class="list-warpper">
-			<view class="input-box" style="background: inherit;font-size:26rpx;">
+			<!-- <view class="input-box" style="background: inherit;font-size:26rpx;">
 				<view class="text-right"><text class=" text-blue text-right cuIcon-add" @click="handleShare(true, 'edit')">上报</text></view>
+			</view> -->
+			<view class=" text-right"><button @click="handleShare(true, 'edit')" style="width: 100rpx;"
+					class="bg-blue cu-btn cuIcon ">上报
+					<text class="cuIcon-add"></text>
+				</button>
 			</view>
 			<template v-if="list.length === 0">
 				<view class="text-center text-grey">暂无数据，请重新查找</view>

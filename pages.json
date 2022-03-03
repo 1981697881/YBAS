@@ -93,6 +93,15 @@
 					"auth": true, //需要登录
 					"async": true //是否同步
 				}
+			},{
+				"path": "fuselage",
+				"style": {
+					"navigationBarTitleText": "机身码查询"
+				},
+				"meta": {
+					"auth": true, //需要登录
+					"async": true //是否同步
+				}
 			},
 			// 二级页面 end
 			// 三级页面 start

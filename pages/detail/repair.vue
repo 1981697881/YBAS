@@ -21,7 +21,8 @@
 				<view class="flex-sub flex align-center">
 					<picker mode="date" :value="searchData.startDate" @change="handleMaxDateChange">
 						<view class="flex align-center">
-							<input type="text" disabled v-model="searchData.startDate" class="flex-sub" placeholder="开始日期" />
+							<input type="text" disabled v-model="searchData.startDate" class="flex-sub"
+								placeholder="开始日期" />
 							<!-- <text v-if="startDate" class="text-clear text-blue">清空</text> -->
 							<text v-if="searchData.startDate" class="text-clear cuIcon-backdelete"
 								@click.stop="handleSearchClear('searchData.startDate')"></text>
@@ -29,7 +30,8 @@
 					</picker>
 					<picker mode="date" :value="searchData.endDate" @change="handleMinDateChange">
 						<view class="flex align-center">
-							<input type="text" disabled v-model="searchData.endDate" class="flex-sub" placeholder="结束日期" />
+							<input type="text" disabled v-model="searchData.endDate" class="flex-sub"
+								placeholder="结束日期" />
 							<!-- <text v-if="endDate" class="text-clear text-blue">清空</text> -->
 							<text v-if="searchData.endDate" class="text-clear cuIcon-backdelete"
 								@click.stop="handleSearchClear('searchData.endDate')"></text>
@@ -37,14 +39,22 @@
 					</picker>
 				</view>
 			</view>
-			<view class="input-box text-blue text-center" style="border-top: 1px solid #ccc;border-bottom: 1px solid #ccc;" @click="getList">查找</view>
+			<view class="input-box text-blue text-center"
+				style="border-top: 1px solid #ccc;border-bottom: 1px solid #ccc;" @click="getList">查找</view>
 		</view>
 		<!-- 搜索条件end -->
 
 		<!-- 列表start -->
 		<view class="list-warpper">
-			<view class="input-box text-right" style="background: inherit;font-size:26rpx;">
+			<!-- <view class="input-box text-right" style="background: inherit;font-size:26rpx;">
 				<text class="flex-sub text-blue text-right cuIcon-add" @click="handleShare(true, 'edit')">我要报修</text>
+			</view> -->
+			<view class=" text-right"><button @click="handleShare(true, 'edit')" style="width: 200rpx;"
+					class="bg-blue cu-btn cuIcon ">我要报修
+					<text class="cuIcon-add"></text>
+				</button>
+				<!-- <text class="flex-sub text-blue text-right cuIcon-add"
+					>登记</text> -->
 			</view>
 			<template v-if="list.length === 0">
 				<view class="text-center text-grey">暂无数据，请重新查找</view>
@@ -54,7 +64,8 @@
 					<uni-collapse-item :title="'维修单号：' + item.repairOrder" :showArrow="true">
 						<template slot="title-right">
 							<view :class="isPayStatus(item) ? 'text-red' : 'text-green'">
-								{{ item.payStatus | filterPayStatus }}</view>
+								{{ item.payStatus | filterPayStatus }}
+							</view>
 						</template>
 						<view class="list-content">
 							<view class="flex align-start" v-for="(detail,detailIndex) in item.repairDetailList"
@@ -169,7 +180,7 @@
 		},
 		computed: {},
 		filters: {
-			filterFixStatus: dataValue => ['待寄回', '待检修', '待维修', '待发货', '待收货', '完成'][dataValue],
+			filterFixStatus: dataValue => ['待寄回', '待检修', '待确认', '待维修', '待发货', '待收货', '完成'][dataValue],
 			filterPayStatus: dataValue => ['未支付', '已支付'][dataValue],
 			formatDate: dateValue => {
 				const date = new Date(dateValue);
@@ -244,8 +255,8 @@
 							if (JSON.stringify(item[key]) === '{}' || JSON.stringify(item[key]) === '[]') {
 								showToast(`第${i + 1}条产品：${formRules[key]}`);
 								return false;
-						}
 							}
+						}
 					}
 				}
 				contactData.repairDetail = formData;
@@ -450,8 +461,8 @@
 		align-items: center;
 		background-color: #ffffff;
 		padding: 16rpx 30rpx;
-	
-	.input-label {
+
+		.input-label {
 			margin-right: 16rpx;
 		}
 	}
@@ -474,8 +485,8 @@
 				color: #fff;
 			}
 		}
-	
-	// 每一个块级项
+
+		// 每一个块级项
 		.uni-collapse {
 			margin-bottom: 16rpx;
 		}

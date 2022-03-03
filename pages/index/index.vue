@@ -12,7 +12,7 @@
 				<!--  -->
 				<u-grid-item v-for="(item, index) in meau" bgColor="white" :custom-style="{ padding: '0', textAlign: 'center', borderRight: '1rpx solid #ccc',borderBottom: '1rpx solid #ccc' }" :key="index">
 					<!-- <uni-icons :type="item.icon"></uni-icons> -->
-					<view style="padding: 60rpx 0;" ><button v-if="index<4" @tap="jump(item.path,{},index)" class="cu-btn round shadow line-black">{{ item.name }}</button><button v-else open-type="contact" class="cu-btn round shadow line-black">{{ item.name }}</button></view>
+					<view style="padding: 60rpx 0;" ><button v-if="index<5" @tap="jump(item.path,{},index)" class="cu-btn round shadow line-black">{{ item.name }}</button><button v-else open-type="contact" class="cu-btn round shadow line-black">{{ item.name }}</button></view>
 				</u-grid-item>
 			</u-grid>
 		</view>
@@ -66,7 +66,9 @@
 							<text>{{ item.repairDetailList[item.page].productModel }}</text>
 						</input-box>
 						<input-box label="维修状态">
-							<text>{{ item.status | getStatus }}</text><button style="width: 150rpx;float: right;" v-if="item.status==4" class="text-blue" @click="confirmReceipt(item)">确认收货</button>
+							<text>{{ item.status | getStatus }}</text>
+							<button style="width: 150rpx;float: right;" v-if="item.status==6" class="text-blue" @click="confirmReceipt(item)">确认收货</button>
+							<button style="width: 150rpx;float: right;" v-if="item.status==3" class="text-blue" @click="confirmReceipt(item)">维修确认</button>
 						</input-box>
 					</view>
 					<custom-pagination class="margin-box" :page="item.page" :total="item.repairDetailList.length" @onChange="handlePageChange($event, item)" ></custom-pagination>
@@ -116,7 +118,7 @@ export default {
 	},
 	filters: {
 		// 通过传入的status数字值，返回对应的字段出去
-		getStatus: value => ['待寄回','待检修','待维修','待发货','待收货','完成'][value || 0] // 控制默认返回下标0的字段
+		getStatus: value => ['待寄回','待检修','待确认','待维修','待发货','待收货','完成'][value || 0] // 控制默认返回下标0的字段
 	},
 	// 下拉顶部刷新
 	// 方法留着对接口的时候供参考
@@ -219,6 +221,24 @@ export default {
 				}
 			});
 		},
+		confirmRepair(item){
+			let that = this
+			// 确认维修
+			that.$api('afterSale.confirmPrice', {
+				repairOrder: item.repairOrder,
+				status: item.status
+			}).then(res => {
+				if (res.flag) {
+					uni.showToast({
+						title: res.msg,
+						mask: true,
+						icon: 'success',
+						duration: 1500
+					});
+					that.init();
+				}
+			});
+		},
 		getDay(date, day) {
 			var today = new Date();
 			var targetday_milliseconds = today.getTime() + 1000 * 60 * 60 * 24 * day;
@@ -251,7 +271,7 @@ export default {
 			// 每个单号下的独立列表赋予当前选中页属性
 			let that = this;
 			this.$api('afterSale.repairList', {
-				status: that.tabCurrent == 1?5:that.tabCurrent
+				status: that.tabCurrent == 1?6:that.tabCurrent
 			}).then(res => {
 				if (res.flag) {
 					this.list = res.data.map(item => Object.assign(item, { page: 0 }));

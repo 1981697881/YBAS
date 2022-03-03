@@ -19,8 +19,12 @@ export default [{
 		icon: 'deliver'
 	},
 	{
+		path: '/pages/detail/fuselage',
+		name: '机身码查询',
+		icon: 'warn'
+	},{
 		path: '',
 		name: '联系客服',
 		icon: 'warn'
-	}
+	},
 ]

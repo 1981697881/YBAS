@@ -66,12 +66,22 @@ export default {
 			auth: true,
 			method: 'POST',
 			// desc: '确认收货',
+		},confirmPrice: {
+			url: 'applet/confirmPrice',
+			auth: true,
+			method: 'POST',
+			// desc: '确认维修',
 		},
 		seriesList: {
 			url: 'partsList/seriesList',
 			auth: true,
 			method: 'POST',
 			// desc: '配件系列',
+		},scanFuselageCode: {
+			url: 'fuselage/scanFuselageCode',
+			auth: true,
+			method: 'POST',
+			// desc: '机身码查询',
 		},scanOutPutOrder: {
 			url: 'outputOrder/scanOutPutOrder',
 			auth: true,
