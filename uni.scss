@@ -2,8 +2,8 @@
 @import '@/static/style/_utils.scss';
 @import '@/static/style/_mixin.scss';
 @import '@/static/style/uni.css';
-@import 'uview-ui/theme.scss';
-$IMG_URL: 'https://shopro.7wpp.com'; //css中背景图片变量。js图片变量在env.js
+@import '_uview-ui@2.0.22@uview-ui/theme.scss';
+$IMG_URL: 'https://gzfzdev.com'; //css中背景图片变量。js图片变量在env.js
 
 .container{
 	// padding: 10px;

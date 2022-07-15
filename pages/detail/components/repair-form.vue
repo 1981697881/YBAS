@@ -20,8 +20,19 @@
 						v-if="!userInfo.phoneNumber" class="cu-btn round lines-red sm" open-type="getPhoneNumber"
 						@getphonenumber="bindPhone">获取</button></input-box>
 			</view>
-			<input-box label="邮寄地址">
+			<input-box label="省市区">
+				<!-- <input type="text" v-model="formData.provinceCity" placeholder="请填写省份市区" /> -->
+				<uni-data-picker placeholder="请选择地址" popup-title="请选择城市" :preload="true" :step-searh="true"
+					self-field="code" parent-field="parent_code" collection="opendb-city-china" orderby="value asc"
+					field="code as value, name as text, eq(['$type', 2]) as isleaf" @change="onchange"
+					@nodeclick="onnodeclick"></uni-data-picker>
+			</input-box>
+			<input-box label="详细地址">
 				<input type="text" v-model="contactData.contactAddress" />
+				<!-- <textarea v-model="contactData.contactAddr" placeholder="请填写邮寄地址" /> -->
+			</input-box>
+			<input-box label="快递单号">
+				<input type="text" v-model="contactData.courierNumber" />
 				<!-- <textarea v-model="contactData.contactAddr" placeholder="请填写邮寄地址" /> -->
 			</input-box>
 		</view>
@@ -42,8 +53,8 @@
 						<uni-icons type="search" size="20" color="#808080" @tap="handleScanBarCode(item)"></uni-icons>
 					</view>
 				</input-box>
-				<input-box label="产品名称"><input type="text" v-model="item.productName" disabled /></input-box>
-				<input-box label="产品型号"><input type="text" v-model="item.productModel" disabled /></input-box>
+				<input-box label="产品名称"><input type="text" v-model="item.productName" /></input-box>
+				<input-box label="产品型号"><input type="text" v-model="item.productModel" /></input-box>
 				<input-box label="购买日期" required>
 					<picker mode="date" v-model="item.productBuyDate" @change="handleBounghtDateChange($event,item)">
 						<view class="flex align-center"><input type="text"  disabled v-model="item.productBuyDate"
@@ -87,9 +98,9 @@
 		API_URL
 	} from '@/env'
 	import mock from '@/common/mock/register';
+	import uniFilePicker from './uni-file-picker/uni-file-picker.vue';
 	export default {
-		components: {
-		},
+		components: {uniFilePicker},
 		data() {
 			return {
 				// 联系信息数据源
@@ -97,7 +108,8 @@
 					repairOrder: '',
 					contactPerson: '',
 					contactNumber: '',
-					contactAddress: ''
+					contactAddress: '',
+					province: ''
 				},
 				// 产品表单数据源
 				formData: [],
@@ -113,6 +125,7 @@
 					faultPhoto: [],
 					voucher: []
 				},
+				
 				// 当前页码数
 				currentPage: 0,
 				// 售后要求选择器数据
@@ -161,6 +174,19 @@
 		},
 		methods: {
 			...mapActions(['getUserDetails']),
+			onchange(e) {
+				let str = "";
+				e.detail.value.forEach((item, index) => {
+					if (index == 0) {
+						str = item.text
+					} else {
+						str = str + "/" + item.text
+					}
+			
+				})
+				this.formData.province = str
+			},
+			onnodeclick(node) {},
 			handleScanBarCode(item) {
 				let that = this
 				let resData = item.productCode.split(';')

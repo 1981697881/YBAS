@@ -1,6 +1,6 @@
 <template>
 	<view class="">
-		<view class="input-box flex">
+		<view class="input-box flex" :style="style">
 			<text class="input-label" :class="{ required: required }" :style="[label.length == 2 ? labelStyle.w2 : label.length == 3 ? labelStyle.w3 : '']">
 				{{ label }}
 			</text>
@@ -13,7 +13,8 @@
 export default {
 	props: {
 		label: '',
-		required: false
+		required: false,
+		style: '',
 	},
 	data() {
 		return {

@@ -12,7 +12,7 @@
 				<!--  -->
 				<u-grid-item v-for="(item, index) in meau" bgColor="white" :custom-style="{ padding: '0', textAlign: 'center', borderRight: '1rpx solid #ccc',borderBottom: '1rpx solid #ccc' }" :key="index">
 					<!-- <uni-icons :type="item.icon"></uni-icons> -->
-					<view style="padding: 60rpx 0;" ><button v-if="index<5" @tap="jump(item.path,{},index)" class="cu-btn round shadow line-black">{{ item.name }}</button><button v-else open-type="contact" class="cu-btn round shadow line-black">{{ item.name }}</button></view>
+					<view style="padding: 60rpx 0;" ><button v-if="index<6" @tap="jump(item.path,{},index)" class="cu-btn round shadow line-black">{{ item.name }}</button><button v-else open-type="contact" class="cu-btn round shadow line-black">{{ item.name }}</button></view>
 				</u-grid-item>
 			</u-grid>
 		</view>
@@ -67,13 +67,13 @@
 						</input-box>
 						<input-box label="维修状态">
 							<text>{{ item.status | getStatus }}</text>
-							<button style="width: 150rpx;float: right;" v-if="item.status==6" class="text-blue" @click="confirmReceipt(item)">确认收货</button>
-							<button style="width: 150rpx;float: right;" v-if="item.status==3" class="text-blue" @click="confirmReceipt(item)">维修确认</button>
+							<button style="width: 150rpx;float: right;" v-if="item.status==5" class="text-blue" @click="confirmReceipt(item)">确认收货</button>
+							<button style="width: 150rpx;float: right;" v-if="item.status==2" class="text-blue" @click="confirmRepair(item)">维修确认</button>
 						</input-box>
 					</view>
 					<custom-pagination class="margin-box" :page="item.page" :total="item.repairDetailList.length" @onChange="handlePageChange($event, item)" ></custom-pagination>
 					<view class="btn-warpper text-center">
-						<text :class="tabCurrent === 0 ? 'text-blue':'text-grey'" @click="doPay(item)">维修费用：{{ item.status>=3? '￥'+item.payPrice: "未完成" }}</text>
+						<text :class="tabCurrent === 0 ? 'text-blue':'text-grey'" @click="doPay(item)">维修费用：{{ item.status>=2? '￥'+item.payPrice: "未完成" }}</text>
 					</view>
 				</uni-collapse-item>
 			</uni-collapse>
@@ -219,7 +219,12 @@ export default {
 					});
 					that.init();
 				}
-			});
+			}).catch(err => {
+					uni.showToast({
+						icon: 'none',
+						title: err.msg,
+					});
+				});
 		},
 		confirmRepair(item){
 			let that = this
@@ -237,7 +242,12 @@ export default {
 					});
 					that.init();
 				}
-			});
+			}).catch(err => {
+					uni.showToast({
+						icon: 'none',
+						title: err.msg,
+					});
+				});
 		},
 		getDay(date, day) {
 			var today = new Date();

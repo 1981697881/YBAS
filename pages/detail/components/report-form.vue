@@ -66,7 +66,9 @@
 		API_URL
 	} from '@/env'
 	import mock from '@/common/mock/register';
+	import uniFilePicker from './uni-file-picker/uni-file-picker.vue';
 	export default {
+		components: {uniFilePicker},
 		props: {
 			isEdit: {
 				type: Boolean,

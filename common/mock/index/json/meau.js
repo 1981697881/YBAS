@@ -23,6 +23,10 @@ export default [{
 		name: '机身码查询',
 		icon: 'warn'
 	},{
+		path: '/pages/detail/query',
+		name: '订单查询',
+		icon: 'warn'
+	},{
 		path: '',
 		name: '联系客服',
 		icon: 'warn'

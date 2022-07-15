@@ -102,6 +102,24 @@
 					"auth": true, //需要登录
 					"async": true //是否同步
 				}
+			},{
+				"path": "query",
+				"style": {
+					"navigationBarTitleText": "订单查询"
+				},
+				"meta": {
+					"auth": true, //需要登录
+					"async": true //是否同步
+				}
+			},{
+				"path": "queryDetail",
+				"style": {
+					"navigationBarTitleText": "订单详情"
+				},
+				"meta": {
+					"auth": true, //需要登录
+					"async": true //是否同步
+				}
 			},
 			// 二级页面 end
 			// 三级页面 start

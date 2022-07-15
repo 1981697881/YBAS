@@ -93,7 +93,7 @@ export default {
 <style lang="scss">
 @import 'static/colorui/main.css';
 @import 'static/colorui/icon.css';
-@import "uview-ui/index.scss";
+@import "_uview-ui@2.0.22@uview-ui/index.scss";
 
 // 其他scss集成在uni.scss,(变量,class,minix)
 

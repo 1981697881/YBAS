@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App'
 import store from '@/common/store'
-import cuCustom from '@/static/colorui/components/cu-custom.vue'
+/* import cuCustom from '@/static/colorui/components/cu-custom.vue' */
 import router from '@/common/router'
 import tools from '@/common/utils/tools'
 import '@/common/utils/sdk/sdk-h5.js'
@@ -11,7 +11,7 @@ import {
 } from './env.js'
 
 //引入全局uView
-import uView from 'uview-ui'
+import uView from '_uview-ui@2.0.22@uview-ui'
 Vue.use(uView)
 
 import shoproShare from '@/common/mixins/app-share'
@@ -28,7 +28,7 @@ Vue.prototype.$tools = tools;
 Vue.prototype.$API_URL = API_URL;
 Vue.prototype.$IMG_URL = IMG_URL;
 
-Vue.component('cu-custom', cuCustom);
+/* Vue.component('cu-custom', cuCustom); */
 Vue.config.productionTip = false;
 App.mpType = 'app';
 const app = new Vue({

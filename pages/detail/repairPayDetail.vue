@@ -4,9 +4,9 @@
 		<cell-box label="总费用" :value="formData.payPrice | rmb"></cell-box>
 		<cell-box label="付款状态">
 			<template slot="value">
-				<view @click="doPay">
+				<view>
 					<text class="text-grey">{{ formData.payStatus | filterPayStatus }}</text>
-					<view v-if="isPayStatus" class="text-blue" :style="{ 'margin-top': !isPayStatus ? '16rpx' : '' }"><text>去支付</text></view>
+					<!-- <view @click="doPay" v-if="isPayStatus" class="text-blue" :style="{ 'margin-top': !isPayStatus ? '16rpx' : '' }"><text>去支付</text></view> -->
 				</view>
 			</template>
 		</cell-box>
@@ -64,10 +64,11 @@
 
 <script>
 import cellBox from './components/cell-box';
+import customShare from './components/custom-share/custom-share.vue';
 
 export default {
 	components: {
-		cellBox,
+		cellBox,customShare
 		
 	},
 	data() {

@@ -122,9 +122,9 @@
 					<view class="flex uni-collapse-footer">
 						<view class="flex-sub text-blue text-center"
 							@click="jump('/pages/detail/repairPayDetail', { repairOrder: item.repairOrder })">查看详细报价
-						</view>
+						</view><!-- @click="doPay(item)" -->
 						<view class="flex-sub text-center" :class="isPayStatus(item) ? 'text-blue' : 'text-grey'"
-							@click="doPay(item)">维修费用：{{ item.status>=3?item.payPrice: "未完成" }}</view>
+							>维修费用：{{ item.status>=3?item.payPrice: "未完成" }}</view>
 					</view>
 				</uni-collapse>
 			</template>
@@ -153,10 +153,10 @@
 
 <script>
 	import repairForm from './components/repair-form';
-
+import customShare from './components/custom-share/custom-share.vue';
 	export default {
 		components: {
-			repairForm
+			repairForm,customShare
 		},
 		data() {
 			return {
@@ -219,7 +219,7 @@
 				})
 			},
 			// 该维修单是否已支付，传入当前维修单的data；0 未支付。1 已支付
-			isPayStatus: item => item.status == '3',
+			isPayStatus: item => item.payStatus,
 			// 登记界面的表单提交
 			submit() {
 				let that = this;
@@ -259,12 +259,32 @@
 						}
 					}
 				}
+				contactData.contactAddress = contactData.province +' '+contactData.contactAddress
 				contactData.repairDetail = formData;
 				that.$api('afterSale.repairDetailAdd', contactData).then(res => {
 					if (res.flag) {
 						showToast(res.msg);
 						that.shareStatus = false;
 						that.getList();
+						wx.requestSubscribeMessage({
+							tmplIds: ['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI','GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'],
+							success: (res) => {
+								if (res['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI','GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'] === 'accept') {
+									wx.showToast({
+										title: '订阅成功！',
+										duration: 1000,
+										success(data) {
+											console.log("消息授权成功")
+											console.log(data)
+										}
+									})
+								} 
+							},
+							fail(err) {
+								console.log("消息授权失败")
+								console.log(err)
+							}
+						})
 					}
 				});
 			},
@@ -290,6 +310,18 @@
 			// 弹出层显示
 			handleShare(value, action) {
 				this.shareStatus = value;
+				const {
+					formData,
+					contactData
+				} = this.$refs['repair-form'];
+				contactData = {
+					repairOrder: '',
+					contactPerson: '',
+					contactNumber: '',
+					contactAddress: '',
+					province: ''
+				};
+				formData = []
 			},
 			handleDelList(item, index) {
 				// item为当前要删除的list.data

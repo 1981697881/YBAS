@@ -85,12 +85,13 @@
 <script>
 import mock from '@/common/mock/register';
 import reportForm from './components/report-form';
+import customShare from './components/custom-share/custom-share.vue';
 import {
 		API_URL
 	} from '@/env'
 export default {
 	components: {
-		reportForm,
+		reportForm,customShare
 		
 	},
 	data() {
@@ -165,6 +166,25 @@ export default {
 					this.shareStatus = false;
 					this.isEdit = false;
 					that.getList();
+					wx.requestSubscribeMessage({
+						tmplIds: ['S9_D9bJHy57UJv16aiNOItmcSHdyhjan0khgNrK_GZg'],
+						success: (res) => {
+							if (res['S9_D9bJHy57UJv16aiNOItmcSHdyhjan0khgNrK_GZg'] === 'accept') {
+								wx.showToast({
+									title: '订阅成功！',
+									duration: 1000,
+									success(data) {
+										console.log("消息授权成功")
+										console.log(data)
+									}
+								})
+							} 
+						},
+						fail(err) {
+							console.log("消息授权失败")
+							console.log(err)
+						}
+					})
 				}
 			});
 			

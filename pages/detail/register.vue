@@ -103,12 +103,14 @@
 <script>
 	import mock from '@/common/mock/register';
 	import registerForm from './components/register-form';
+	import customShare from './components/custom-share/custom-share.vue';
 	import {
 		API_URL
 	} from '@/env'
+	import uniFilePicker from './components/uni-file-picker/uni-file-picker.vue';
 	export default {
 		components: {
-			registerForm
+			registerForm,customShare,uniFilePicker
 		},
 		data() {
 			return {
