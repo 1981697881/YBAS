@@ -26,12 +26,17 @@
 			<input-box label="保修期至"><input type="text" v-model="formData.productGuarantee" class="flex-sub" disabled
 					placeholder="自动计算,最少一年" /></input-box>
 			<input-box label="省市区">
-				<!-- <input type="text" v-model="formData.provinceCity" placeholder="请填写省份市区" /> -->
+				<view class="flex align-center" @click="openPicker"><input type="text" disabled v-model="formData.province"
+						class="flex-sub" placeholder="请填写省份市区" /></view>
+			 <lotus-address v-on:choseVal="choseValue" :lotusAddressData="lotusAddressData"></lotus-address>
+				</input-box>
+			<!-- <input-box label="省市区">
+				<input type="text" v-model="formData.provinceCity" placeholder="请填写省份市区" />
 				<uni-data-picker placeholder="请选择地址" popup-title="请选择城市" :preload="true" :step-searh="true"
 					self-field="code" parent-field="parent_code" collection="opendb-city-china" orderby="value asc"
 					field="code as value, name as text, eq(['$type', 2]) as isleaf" @change="onchange"
 					@nodeclick="onnodeclick"></uni-data-picker>
-			</input-box>
+			</input-box> -->
 			<input-box label="联系电话"><input type="text" v-model="formData.contactNumber" placeholder="请输入电话或座机号码" />
 			</input-box>
 			<input-box label="联系地址"><input type="text" v-model="formData.contactAddress" placeholder="请输入联系地址" />
@@ -49,13 +54,23 @@
 	import {
 		API_URL
 	} from '@/env'
+	import address from '@/common/address.json';
 	import mock from '@/common/mock/register';
-	import uniFilePicker from './uni-file-picker/uni-file-picker.vue';
+	import lotusAddress from "@/components/Winglau14-lotusAddress/Winglau14-lotusAddress.vue";
 	export default {
-		components: {uniFilePicker},
+		components: {
+			  "lotus-address":lotusAddress
+		},
 		data() {
 			return {
 				isReview: false,
+				 lotusAddressData:{
+				                visible:false,
+				                provinceName:'',
+				                cityName:'',
+				                townName:'',
+				            },
+				            region:'',
 				// 数据源
 				formData: {
 					productCode: '',
@@ -68,6 +83,7 @@
 					contactAddress: '',
 					voucher: []
 				},
+				codeBarcode: {},
 				// 必填项目，对应formData的字段，只需要写“验证提示内容”皆可
 				formRules: {
 					productCode: '产品条码不能为空',
@@ -95,20 +111,51 @@
 		mounted: function() {
 			this.imageUrl = API_URL.replace("/yingbao","")+'uploadFiles/image/'
 		},
+		onLoad() {
+			
+		},
 		methods: {
+			 //打开picker
+			        openPicker() {
+			            this.lotusAddressData.visible = true;
+						if(this.lotusAddressData.provinceName == ''){
+							this.lotusAddressData.provinceName = '广东省';
+							this.lotusAddressData.cityName = '广州市';
+							this.lotusAddressData.townName = '白云区';
+						}
+			        },
+			        //回传已选的省市区的值
+			        choseValue(res){
+			            //res数据源包括已选省市区与省市区code
+			            console.log(res);
+			            this.lotusAddressData.visible = res.visible;//visible为显示与关闭组件标识true显示false隐藏
+			            //res.isChose = 1省市区已选 res.isChose = 0;未选
+			            if(res.isChose){
+			                this.lotusAddressData.provinceName = res.province;//省
+			                this.lotusAddressData.cityName = res.city;//市
+			                this.lotusAddressData.townName = res.town;//区
+			                this.formData.province = `${res.province} ${res.city} ${res.town}`; //region为已选的省市区的值
+			            }
+			        },
 			handleScanBarCode() {
 				let that = this
 				let resData = that.formData.productCode.split(';')
 				that.$api('afterSale.productionMessage', {
 					productBarcode: that.formData.productCode
 				}).then(reso => {
-					if (reso.flag) {
+					if (reso.flag && reso.data !=null) {
 						let obj = {}
 						obj.name = reso.data.productName;
 						obj.model = reso.data.productModel;
 						obj.barCode = this.formData.productCode;
 						that.scanBarcode(obj);
-					}
+						
+					}else{
+									uni.showToast({
+										icon: 'none',
+										title: '搜索不到产品信息',
+									});
+								}
 				});
 				/* if (resData.length > 1) {
 					let obj = {}
@@ -204,9 +251,10 @@
 			},
 			// 购买日期选择器
 			handleBounghtDateChange: function(e) {
+				console.log(this.codeBarcode)
 				this.formData.productBuyDate = e.target.value;
 			}
-		}
+		} 
 	};
 </script>
 

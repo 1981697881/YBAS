@@ -49,7 +49,7 @@
 			<!-- <view class="input-box text-right" style="background: inherit;font-size:26rpx;">
 				<text class="flex-sub text-blue text-right cuIcon-add" @click="handleShare(true, 'edit')">我要报修</text>
 			</view> -->
-			<view class=" text-right"><button @click="handleShare(true, 'edit')" style="width: 200rpx;"
+			<view class=" text-right"><button @click="handleShare" style="width: 200rpx;"
 					class="bg-blue cu-btn cuIcon ">我要报修
 					<text class="cuIcon-add"></text>
 				</button>
@@ -70,7 +70,7 @@
 						<view class="list-content">
 							<view class="flex align-start" v-for="(detail,detailIndex) in item.repairDetailList"
 								:key="detailIndex">
-								<view class="flex-sub">
+								<view class="flex-sub" @tap="handleShare('edit',item)">
 									<input-box label="产品条码">
 										<text>{{ detail.productCode }}</text>
 									</input-box>
@@ -99,7 +99,7 @@
 									<input-box label="物流公司">
 										<text>{{ item.logistics.expressName }}</text>
 									</input-box>
-									<input-box label="物流单号" @tap="clickNum(item.logistics.expressOrder)">
+									<input-box label="物流单号" @tap.stop="clickNum(item.logistics.expressOrder)">
 										<text class="text-cyan">{{ item.logistics.expressOrder }}</text>
 									</input-box>
 								</view>
@@ -259,34 +259,71 @@ import customShare from './components/custom-share/custom-share.vue';
 						}
 					}
 				}
-				contactData.contactAddress = contactData.province +' '+contactData.contactAddress
+				contactData.contactAddress = contactData.province +'-'+contactData.contactAddress
 				contactData.repairDetail = formData;
-				that.$api('afterSale.repairDetailAdd', contactData).then(res => {
-					if (res.flag) {
-						showToast(res.msg);
-						that.shareStatus = false;
-						that.getList();
-						wx.requestSubscribeMessage({
-							tmplIds: ['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI','GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'],
-							success: (res) => {
-								if (res['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI','GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'] === 'accept') {
-									wx.showToast({
-										title: '订阅成功！',
-										duration: 1000,
-										success(data) {
-											console.log("消息授权成功")
-											console.log(data)
-										}
-									})
-								} 
-							},
-							fail(err) {
-								console.log("消息授权失败")
-								console.log(err)
-							}
-						})
-					}
-				});
+				if(contactData.repairOrder != ''){
+					that.$api('afterSale.repairDetailUpdate', contactData).then(res => {
+						if (res.flag) {
+							uni.showToast({
+								icon: 'none',
+								title: res.msg,
+							});
+							that.shareStatus = false;
+							that.getList();
+							wx.requestSubscribeMessage({
+								tmplIds: ['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI','GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'],
+								success: (res) => {
+									if (res['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI','GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'] === 'accept') {
+										wx.showToast({
+											title: '订阅成功！',
+											duration: 1000,
+											success(data) {
+												console.log("消息授权成功")
+												console.log(data)
+											}
+										})
+									} 
+								},
+								fail(err) {
+									console.log("消息授权失败")
+									console.log(err)
+								}
+							})
+						}else{
+							uni.showToast({
+								icon: 'none',
+								title: res.msg,
+							});
+						}
+					});
+				}else{
+					that.$api('afterSale.repairDetailAdd', contactData).then(res => {
+						if (res.flag) {
+							showToast(res.msg);
+							that.shareStatus = false;
+							that.getList();
+							wx.requestSubscribeMessage({
+								tmplIds: ['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI','GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'],
+								success: (res) => {
+									if (res['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI','GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'] === 'accept') {
+										wx.showToast({
+											title: '订阅成功！',
+											duration: 1000,
+											success(data) {
+												console.log("消息授权成功")
+												console.log(data)
+											}
+										})
+									} 
+								},
+								fail(err) {
+									console.log("消息授权失败")
+									console.log(err)
+								}
+							})
+						}
+					});
+				}
 			},
 			// 支付维修费用
 			doPay(item) {
@@ -310,18 +347,36 @@ import customShare from './components/custom-share/custom-share.vue';
 			// 弹出层显示
 			handleShare(value, action) {
 				this.shareStatus = value;
-				const {
-					formData,
-					contactData
-				} = this.$refs['repair-form'];
-				contactData = {
-					repairOrder: '',
-					contactPerson: '',
-					contactNumber: '',
-					contactAddress: '',
-					province: ''
-				};
-				formData = []
+				if(value=="edit"){
+					console.log(action)
+					this.$refs['repair-form'].contactData = {
+						repairOrder: action.repairOrder,
+						contactPerson: action.contactPerson,
+						contactNumber: action.contactNumber,
+						contactAddress: action.contactAddress.split('-')[1],
+						province: `${action.contactAddress.split('-')[0].split(' ')[0]} ${action.contactAddress.split('-')[0].split(' ')[1]} ${action.contactAddress.split('-')[0].split(' ')[2]}`,
+						provinceNum: action.provinceNum,
+						courierNumber: action.courierNumber,
+					};
+					this.$refs['repair-form'].lotusAddressData = {
+						provinceName: action.contactAddress.split('-')[0].split(' ')[0],
+						visible: false,
+						cityName: action.contactAddress.split('-')[0].split(' ')[1],
+						townName: action.contactAddress.split('-')[0].split(' ')[2],
+					};
+					this.$refs['repair-form'].formData = action.repairDetailList
+				}else{
+					this.$refs['repair-form'].contactData = {
+						repairOrder: '',
+						contactPerson: '',
+						contactNumber: '',
+						contactAddress: '',
+						province: '',
+						provinceNum: '',
+						courierNumber: ''
+					};
+					this.$refs['repair-form'].formData = []
+				}
 			},
 			handleDelList(item, index) {
 				// item为当前要删除的list.data
@@ -354,14 +409,20 @@ import customShare from './components/custom-share/custom-share.vue';
 							that.$api('afterSale.productionMessage', {
 								productBarcode: res.result
 							}).then(reso => {
-								if (reso.flag) {
+								if (reso.flag && reso.data !=null) {
 									let obj = {}
 									obj.name = reso.data.productName;
 									obj.model = reso.data.productModel;
 									obj.barCode = res.result;
 									that.$nextTick(function() {
 										that.$refs['repair-form'].scanBarcode(obj);
+										that.$refs['repair-form'].codeBarcode = reso.data;
 									})
+								}else{
+									uni.showToast({
+										icon: 'none',
+										title: '搜索不到产品信息',
+									});
 								}
 							});
 							/* if (resData.length > 1) {

@@ -37,7 +37,7 @@
 		</cell-box>
 		<cell-box label="工时费" :value="proData.workMoney | rmb"></cell-box>
 		<cell-box label="运费" :value="proData.freight | rmb"></cell-box>
-		<cell-box label="优惠后价格" :value="proData.discountMoney | rmb"></cell-box>
+		<cell-box label="实收金额" :value="proData.discountMoney | rmb"></cell-box>
 		<!-- 产品列表end -->
 		</block>
 		<!--配件清单弹出层start -->

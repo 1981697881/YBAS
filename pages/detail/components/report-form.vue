@@ -38,7 +38,7 @@
 			<view class="form-warpper" v-if="currentPage == index">
 				<input-box label="产品条码" required>
 					<view class="flex align-center">
-						<input class="flex-sub" type="text" v-model="item.productBarcode" placeholder="请输入或扫描产品包装盒上的条码"
+						<input class="flex-sub" type="text" confirm-type="search" @confirm="confirmBarcode(item)" v-model="item.productBarcode" placeholder="请输入或扫描产品包装盒上的条码"
 							:disabled="!isEdit" />
 						<uni-icons v-if="isEdit" size="20" type="scan" color="#808080" @tap="handleScanBarCode(item)"></uni-icons>
 					</view>
@@ -202,6 +202,13 @@
 				const data = JSON.parse(JSON.stringify(this.formDataCopy))
 				this.$set(this.formData, this.formData.length, data)
 				this.currentPage = this.formData.length - 1
+				if(this.formData.length>0){
+					if(this.formData[this.currentPage-1].productBarcode !=''){
+						uni.setClipboardData({
+						    data: this.formData[this.currentPage-1].productBarcode
+						});
+					}
+				}
 			},
 			// 监听切换页
 			/**
@@ -273,37 +280,29 @@
 				uni.scanCode({
 					success: function(res) {
 						let resData = res.result.split(';')
-						that.$api('afterSale.productionMessage', {
-							productBarcode: res.result,
-							status: 0,
-						}).then(reso => {
-							if (reso.flag) {
-								let obj = {}
-								item.productName = reso.data.productName;
-								item.productModel = reso.data.productModel;
-								item.productBarcode = res.result;
-							}
-						});
-						/* if (resData.length > 1) {
-							let obj = {}
-							item.productName = resData[2];
-							item.productModel = resData[1];
-							item.productBarcode = res.result;
-						} else {
-							that.$api('afterSale.productionMessage', {
-								productBarcode: res.result
-							}).then(reso => {
-								if (reso.flag) {
-									let obj = {}
-									item.productName = reso.data.productName;
-									item.productModel = reso.data.productModel;
-									item.productBarcode = res.result;
-								}
-							});
-						} */
+						item.productBarcode = res.result;
+						that.confirmBarcode(item);
 					}
 				});
 			},
+			confirmBarcode(item){
+				let that = this;
+				that.$api('afterSale.productionMessage', {
+					productBarcode: item.productBarcode,
+					status: 0,
+				}).then(reso => {
+					if (reso.flag && reso.data !=null) {
+						let obj = {}
+						item.productName = reso.data.productName;
+						item.productModel = reso.data.productModel;
+					}else{
+							uni.showToast({
+								icon: 'none',
+								title: reso.msg,
+							});
+						}
+				});
+			}
 		}
 	};
 </script>

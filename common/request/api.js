@@ -16,6 +16,11 @@ export default {
 			auth: true,
 			method: 'POST',
 			// desc: '报修',
+		},repairDetailUpdate: {
+			url: 'applet/repairDetail/update',
+			auth: true,
+			method: 'POST',
+			// desc: '报修修改',
 		},posterList: {
 			url: 'applet/api/posterList',
 			auth: true,

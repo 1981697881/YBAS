@@ -19,7 +19,7 @@
 		<!-- 菜单入口 end -->
 		<!-- 通知 start -->
 		<custom-title title="客服留言">
-			<view class="text-blue"><text style="margin-right: 6rpx;">查看更多</text></view>
+			
 		</custom-title>
 		<view class="notice-warpper flex flex-direction margin-box">
 			<view class="flex">
@@ -36,6 +36,7 @@
 					:volumeIcon="false"
 					:padding="0"
 				></u-notice-bar>
+				<view class="text-blue" style="line-height: 64rpx;">查看更多</view>
 			</view>
 		</view>
 		<!-- 通知 end -->
@@ -55,7 +56,16 @@
 			<!-- 报修列表 start -->
 			<uni-collapse v-for="(item, index) in currentList" :key="index">
 				<uni-collapse-item :title="'维修单号：' + item.repairOrder" :open="index === 0">
-					<view class="list-item">
+					<view class="list-item" @tap="paste(item)">
+						<input-box label="联系人">
+							<text>{{ item.contactPerson }}</text>
+						</input-box>
+						<input-box label="联系电话">
+							<text>{{ item.contactNumber }}</text>
+						</input-box>
+						<input-box label="地址">
+							<text>{{ item.contactAddress }}</text>
+						</input-box>
 						<input-box label="产品条码">
 							<text>{{ item.repairDetailList[item.page].productCode }}</text>
 						</input-box>
@@ -137,6 +147,11 @@ export default {
 		});
 	},
 	methods: {
+		paste(item) {
+		    uni.setClipboardData({
+		        data: '联系人:'+item.contactPerson+';联系电话:'+item.contactNumber+";地址:"+item.contactAddress+";"
+		    });
+		},
 		// 监听分页器的变化，修改当前单号下的页数
 		handlePageChange(newPage,item) {
 			item.page = newPage

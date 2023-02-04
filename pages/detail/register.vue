@@ -197,6 +197,8 @@
 					if (res.flag) {
 						that.getList();
 						showToast(res.msg);
+					}else{
+						showToast(res.msg);
 					}
 				});
 
@@ -205,6 +207,17 @@
 			// 弹出层显示
 			handleShare(value, action) {
 				this.shareStatus = value;
+				this.$refs['register-form'].formData = {
+					productCode: '',
+					productName: '',
+					productModel: '',
+					productBuyDate: '',
+					productGuarantee: '',
+					province: '',
+					contactNumber: '',
+					contactAddress: '',
+					voucher: []
+				}
 			},
 			handleDelList(item, index) {
 				// item为当前要删除的list.data
@@ -237,7 +250,7 @@
 							that.$api('afterSale.productionMessage', {
 								productBarcode: res.result
 							}).then(reso => {
-								if (reso.flag) {
+								if (reso.flag && reso.data !=null) {
 									let obj = {}
 									obj.name = reso.data.productName;
 									obj.model = reso.data.productModel;
@@ -245,6 +258,11 @@
 									that.$nextTick(function() {
 										that.$refs['register-form'].scanBarcode(obj);
 									})
+								}else{
+									uni.showToast({
+										icon: 'none',
+										title: '搜索不到产品信息',
+									});
 								}
 							});
 							/* if (resData.length > 1) {
