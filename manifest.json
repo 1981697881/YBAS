@@ -75,7 +75,11 @@
         "usingComponents" : true
     },
     "mp-toutiao" : {
-        "usingComponents" : true
+        "usingComponents" : true,
+        "setting" : {
+            "minified" : false,
+            "urlCheck" : false
+        }
     },
     "uniStatistics" : {
         "enable" : false

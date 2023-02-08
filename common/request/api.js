@@ -138,6 +138,13 @@ export default {
 		method: 'POST',
 		// desc: '上传',
 	},
+	/** 上传图片 ↓ **/
+	address: {
+		url: 'address.json',
+		auth: false,
+		method: 'get',
+		// desc: '上传',
+	},
 
 	/** 上传Base64图片 ↓ **/
 	uploadBase64: {

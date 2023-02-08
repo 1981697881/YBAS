@@ -54,12 +54,13 @@
 	import {
 		API_URL
 	} from '@/env'
-	import address from '@/common/address.json';
+	import uniFilePicker from './uni-file-picker/uni-file-picker.vue';
 	import mock from '@/common/mock/register';
 	import lotusAddress from "@/components/Winglau14-lotusAddress/Winglau14-lotusAddress.vue";
 	export default {
 		components: {
-			  "lotus-address":lotusAddress
+			  "lotus-address":lotusAddress,
+			  "uni-file-picker":uniFilePicker
 		},
 		data() {
 			return {
@@ -202,7 +203,7 @@
 				let that = this
 				// tempFiles - Array[Files]
 				// 控制台查看该组件的files数据类型
-				e.tempFiles.map((item, index) => {
+				e.tempFiles.map((item, index) => { address
 					// TODO 根据业务需求修改所需要的数据，以下代码目前用作前端测试用
 					uni.uploadFile({
 						url: API_URL + 'file/imgUpload',

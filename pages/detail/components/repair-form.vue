@@ -117,11 +117,12 @@
 		API_URL
 	} from '@/env'
 	import mock from '@/common/mock/register';
-	/* import uniFilePicker from './uni-file-picker/uni-file-picker.vue'; */
+	import uniFilePicker from './uni-file-picker/uni-file-picker.vue';
 	import lotusAddress from "@/components/Winglau14-lotusAddress/Winglau14-lotusAddress.vue";
 	export default {
 		components: {
-			"lotus-address":lotusAddress
+			"lotus-address":lotusAddress,
+			"uni-file-picker":uniFilePicker
 		},
 		data() {
 			return {
@@ -133,7 +134,7 @@
 				           },
 				           region:'',
 				// 联系信息数据源
-				contactData: {
+				contactData: { 
 					repairOrder: '',
 					contactPerson: '',
 					contactNumber: '',
@@ -247,7 +248,8 @@
 				let that = this
 				let resData = item.productCode.split(';')
 				that.$api('afterSale.productionMessage', {
-					productBarcode: item.productCode
+					productBarcode: item.productCode,
+					status: 1
 				}).then(reso => {
 					if (reso.flag && reso.data != null) {
 						let obj = {};
