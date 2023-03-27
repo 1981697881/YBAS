@@ -18,10 +18,11 @@
 			<input-box label="产品名称"><input type="text" v-model="formData.productName" disabled /></input-box>
 			<input-box label="产品型号"><input type="text" v-model="formData.productModel" disabled /></input-box>
 			<input-box label="购买日期" required>
-				<picker mode="date" v-model="formData.bounghtDate" @change="handleBounghtDateChange">
+				<uni-datetime-picker type="date" :clear-icon="false" v-model="formData.bounghtDate" @change="handleBounghtDateChange" @maskClick="maskClick" />
+				<!-- <picker mode="date" v-model="formData.bounghtDate" @change="handleBounghtDateChange">
 					<view class="flex align-center"><input type="text" disabled v-model="formData.productBuyDate"
 							class="flex-sub" placeholder="请选择日期" /></view>
-				</picker>
+				</picker> -->
 			</input-box>
 			<input-box label="保修期至"><input type="text" v-model="formData.productGuarantee" class="flex-sub" disabled
 					placeholder="自动计算,最少一年" /></input-box>
@@ -43,7 +44,7 @@
 			</input-box>
 			<!-- 支持多选 -->
 			<input-box label="购买凭证" required>
-				<uni-file-picker :auto-upload="false" v-model="item.voucher" :limit="3" file-mediatype="image"
+				<uni-file-picker :auto-upload="false" :value="item.voucher" :limit="3" file-mediatype="image"
 					mode="grid" file-extname="png,jpg" @select="select" @delete="delFile" />
 			</input-box>
 		</view>
@@ -57,10 +58,12 @@
 	import uniFilePicker from './uni-file-picker/uni-file-picker.vue';
 	import mock from '@/common/mock/register';
 	import lotusAddress from "@/components/Winglau14-lotusAddress/Winglau14-lotusAddress.vue";
+	import uniDatetimePicker from './uni-datetime-picker/uni-datetime-picker.vue';
 	export default {
 		components: {
 			  "lotus-address":lotusAddress,
-			  "uni-file-picker":uniFilePicker
+			  "uni-file-picker":uniFilePicker,
+			  "uni-datetime-picker":uniDatetimePicker
 		},
 		data() {
 			return {
@@ -252,8 +255,7 @@
 			},
 			// 购买日期选择器
 			handleBounghtDateChange: function(e) {
-				console.log(this.codeBarcode)
-				this.formData.productBuyDate = e.target.value;
+				this.formData.productBuyDate = e;
 			}
 		} 
 	};

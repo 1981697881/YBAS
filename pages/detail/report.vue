@@ -5,7 +5,8 @@
 			<view class="input-box flex">
 				<text class="input-label">上报日期</text>
 				<view class="flex-sub flex align-center">
-					<picker mode="date" :value="searchData.startDate" @change="handleMaxDateChange">
+					<uni-datetime-picker v-model="range" type="daterange" @maskClick="maskClick" />
+					<!-- <picker mode="date" :value="searchData.startDate" @change="handleMaxDateChange">
 						<view class="flex align-center">
 							<input type="text" disabled v-model="searchData.startDate" class="flex-sub"
 								placeholder="开始日期" />
@@ -20,7 +21,7 @@
 							<text v-if="searchData.endDate" class="text-clear cuIcon-backdelete"
 								@click.stop="handleSearchClear('searchData.endDate')"></text>
 						</view>
-					</picker>
+					</picker> -->
 				</view>
 			</view>
 			<view class="input-box text-blue text-center"
@@ -95,23 +96,25 @@
 	import mock from '@/common/mock/register';
 	import reportForm from './components/report-form';
 	import customShare from './components/custom-share/custom-share.vue';
+	import uniDatetimePicker from './components/uni-datetime-picker/uni-datetime-picker.vue';
 	import {
 		API_URL
 	} from '@/env'
 	export default {
 		components: {
 			reportForm,
-			customShare
-
+			customShare,
+			uniDatetimePicker
 		},
 		data() {
 			return {
+				range: [Date.now() - 1000000000, Date.now() + 1000000000],
 				// 查找的数据集
 				searchData: {
 					// 上报日期-最大日期
-					startDate: null,
+					startDate: Date.now() - 1000000000,
 					// 上报日期-最小日期
-					endDate: null
+					endDate: Date.now() + 1000000000
 				},
 				// 查找的列表数据
 				list: [],
@@ -133,10 +136,18 @@
 			},
 			filterStatus: dataValue => ['未处理', '已处理'][dataValue || 0],
 		},
-		watch: {},
+		watch: {
+			range(newval) {
+				this.searchData.startDate = newval[0];
+				this.searchData.endDate = newval[1];
+			},
+		},
 
 		mounted() {},
 		methods: {
+			maskClick(e) {
+				console.log('maskClick事件:', e);
+			},
 			// 表单提交
 			submit() {
 				let that = this;

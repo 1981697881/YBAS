@@ -50,7 +50,7 @@
 			</view>
 			<!-- 支持多选 -->
 			<input-box label="相关图片" v-if="currentPage == index">
-				<uni-file-picker :readonly="!isEdit" :auto-upload="false" v-model="item.photos" :disabled="!isEdit" :limit="3" file-mediatype="image"
+				<uni-file-picker :readonly="!isEdit" :auto-upload="false" :value="item.photos" :disabled="!isEdit" :limit="3" file-mediatype="image"
 					mode="grid" file-extname="png,jpg" @select="select($event, 'fault',item)"
 					@delete="delFile($event, 'fault',item)" />
 			</input-box>

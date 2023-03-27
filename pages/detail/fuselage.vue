@@ -24,7 +24,7 @@
 					<input-box label="产品名称">
 						<text>{{ item.productName }}</text>
 					</input-box>
-					<input-box label="生产日期">
+					<input-box label="出货日期">
 						<text>{{ item.outputDate }}</text>
 					</input-box>
 					<input-box label="机身码">
@@ -35,6 +35,9 @@
 					</input-box>
 					<input-box label="客户编码">
 						<text>{{ item.custNumber }}</text>
+					</input-box>
+					<input-box label="出库单号">
+						<text>{{ item.outPutOrderNumber }}</text>
 					</input-box>
 				</view>
 			</template>

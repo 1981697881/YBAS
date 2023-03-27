@@ -19,11 +19,16 @@
 			<view class="input-box flex">
 				<text class="input-label">报修日期</text>
 				<view class="flex-sub flex align-center">
-					<picker mode="date" :value="searchData.startDate" @change="handleMaxDateChange">
+					<uni-datetime-picker v-model="range" type="daterange" @maskClick="maskClick" />
+				</view>
+			</view>
+			<!-- <view class="input-box flex">
+				<text class="input-label">报修日期</text>
+				<view class="flex-sub flex align-center">
+					<picker mode="date" ref="pickerRef" :value="searchData.startDate" @change="handleMaxDateChange">
 						<view class="flex align-center">
 							<input type="text" disabled v-model="searchData.startDate" class="flex-sub"
 								placeholder="开始日期" />
-							<!-- <text v-if="startDate" class="text-clear text-blue">清空</text> -->
 							<text v-if="searchData.startDate" class="text-clear cuIcon-backdelete"
 								@click.stop="handleSearchClear('searchData.startDate')"></text>
 						</view>
@@ -32,13 +37,12 @@
 						<view class="flex align-center">
 							<input type="text" disabled v-model="searchData.endDate" class="flex-sub"
 								placeholder="结束日期" />
-							<!-- <text v-if="endDate" class="text-clear text-blue">清空</text> -->
 							<text v-if="searchData.endDate" class="text-clear cuIcon-backdelete"
 								@click.stop="handleSearchClear('searchData.endDate')"></text>
 						</view>
 					</picker>
 				</view>
-			</view>
+			</view> -->
 			<view class="input-box text-blue text-center"
 				style="border-top: 1px solid #ccc;border-bottom: 1px solid #ccc;" @click="getList">查找</view>
 		</view>
@@ -123,8 +127,8 @@
 						<view class="flex-sub text-blue text-center"
 							@click="jump('/pages/detail/repairPayDetail', { repairOrder: item.repairOrder })">查看详细报价
 						</view><!-- @click="doPay(item)" -->
-						<view class="flex-sub text-center" :class="isPayStatus(item) ? 'text-blue' : 'text-grey'"
-							>维修费用：{{ item.status>=3?item.payPrice: "未完成" }}</view>
+						<view class="flex-sub text-center" :class="isPayStatus(item) ? 'text-blue' : 'text-grey'">
+							维修费用：{{ item.status>=3?item.payPrice: "未完成" }}</view>
 					</view>
 				</uni-collapse>
 			</template>
@@ -153,13 +157,17 @@
 
 <script>
 	import repairForm from './components/repair-form';
-import customShare from './components/custom-share/custom-share.vue';
+	import customShare from './components/custom-share/custom-share.vue';
+	import uniDatetimePicker from './components/uni-datetime-picker/uni-datetime-picker.vue';
 	export default {
 		components: {
-			repairForm,customShare
+			repairForm,
+			customShare,
+			uniDatetimePicker
 		},
 		data() {
 			return {
+				range: [Date.now() - 1000000000, Date.now() + 1000000000],
 				// 查找的数据集
 				searchData: {
 					// 产品条码
@@ -167,9 +175,9 @@ import customShare from './components/custom-share/custom-share.vue';
 					// 维修单号
 					repairOrder: '',
 					// 购买日期-最大日期
-					startDate: null,
+					startDate: Date.now() - 1000000000,
 					// 购买日期-最小日期
-					endDate: null
+					endDate: Date.now() + 1000000000
 				},
 				// 查找的列表数据
 				list: [],
@@ -187,10 +195,17 @@ import customShare from './components/custom-share/custom-share.vue';
 				return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
 			}
 		},
-		watch: {},
-
+		watch: {
+			range(newval) {
+				this.searchData.startDate = newval[0];
+				this.searchData.endDate = newval[1];
+			},
+		},
 		mounted() {},
 		methods: {
+			maskClick(e) {
+				console.log('maskClick事件:', e);
+			},
 			clickNum(val) {
 				uni.setClipboardData({
 					data: val, //要被复制的内容
@@ -229,7 +244,6 @@ import customShare from './components/custom-share/custom-share.vue';
 					formRules,
 					contactData
 				} = this.$refs['repair-form'];
-				console.log(formData);
 				const showToast = function(value) {
 					uni.showToast({
 						title: value,
@@ -238,11 +252,12 @@ import customShare from './components/custom-share/custom-share.vue';
 						duration: 1500
 					});
 				};
+				let formDataTik = JSON.parse(JSON.stringify(formData))
 				// 该页面的formData是Array类型
-				for (let i = 0; i < formData.length; i++) {
-					const item = formData[i];
-					formData[i].voucher = JSON.stringify(formData[i].voucher)
-					formData[i].faultPhoto = JSON.stringify(formData[i].faultPhoto)
+				for (let i = 0; i < formDataTik.length; i++) {
+					const item = formDataTik[i];
+					formDataTik[i].voucher = JSON.stringify(formDataTik[i].voucher)
+					formDataTik[i].faultPhoto = JSON.stringify(formDataTik[i].faultPhoto)
 					for (let key in formRules) {
 						if (typeof item[key] === 'string') {
 							if (item[key] === '') {
@@ -251,7 +266,6 @@ import customShare from './components/custom-share/custom-share.vue';
 							}
 						}
 						if (typeof item[key] === 'object') {
-							console.log(JSON.stringify(item));
 							if (JSON.stringify(item[key]) === '{}' || JSON.stringify(item[key]) === '[]') {
 								showToast(`第${i + 1}条产品：${formRules[key]}`);
 								return false;
@@ -259,9 +273,9 @@ import customShare from './components/custom-share/custom-share.vue';
 						}
 					}
 				}
-				contactData.contactAddress = contactData.province +'-'+contactData.contactAddress
-				contactData.repairDetail = formData;
-				if(contactData.repairOrder != ''){
+				contactData.contactAddress = contactData.province + '-' + contactData.contactAddress
+				contactData.repairDetail = formDataTik;
+				if (contactData.repairOrder != '') {
 					that.$api('afterSale.repairDetailUpdate', contactData).then(res => {
 						if (res.flag) {
 							uni.showToast({
@@ -270,10 +284,15 @@ import customShare from './components/custom-share/custom-share.vue';
 							});
 							that.shareStatus = false;
 							that.getList();
+							contactData = {}
 							wx.requestSubscribeMessage({
-								tmplIds: ['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI','GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'],
+								tmplIds: ['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI',
+									'GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'
+								],
 								success: (res) => {
-									if (res['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI','GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'] === 'accept') {
+									if (res['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI',
+											'GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'] ===
+										'accept') {
 										wx.showToast({
 											title: '订阅成功！',
 											duration: 1000,
@@ -282,30 +301,35 @@ import customShare from './components/custom-share/custom-share.vue';
 												console.log(data)
 											}
 										})
-									} 
+									}
 								},
 								fail(err) {
 									console.log("消息授权失败")
 									console.log(err)
 								}
 							})
-						}else{
+						} else {
 							uni.showToast({
 								icon: 'none',
 								title: res.msg,
 							});
 						}
 					});
-				}else{
+				} else {
 					that.$api('afterSale.repairDetailAdd', contactData).then(res => {
 						if (res.flag) {
 							showToast(res.msg);
 							that.shareStatus = false;
 							that.getList();
+							contactData = {}
 							wx.requestSubscribeMessage({
-								tmplIds: ['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI','GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'],
+								tmplIds: ['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI',
+									'GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'
+								],
 								success: (res) => {
-									if (res['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI','GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'] === 'accept') {
+									if (res['nEeDyvzRMz71h4JyVxvnr050Xo-znFAHsOPVZTpgMoI',
+											'GW11IrdJlW10kcoyrjmrXyMCxdO7O_qT3joFEajWpeY'] ===
+										'accept') {
 										wx.showToast({
 											title: '订阅成功！',
 											duration: 1000,
@@ -314,7 +338,7 @@ import customShare from './components/custom-share/custom-share.vue';
 												console.log(data)
 											}
 										})
-									} 
+									}
 								},
 								fail(err) {
 									console.log("消息授权失败")
@@ -347,8 +371,7 @@ import customShare from './components/custom-share/custom-share.vue';
 			// 弹出层显示
 			handleShare(value, action) {
 				this.shareStatus = value;
-				if(value=="edit"){
-					console.log(action)
+				if (value == "edit") {
 					this.$refs['repair-form'].contactData = {
 						repairOrder: action.repairOrder,
 						contactPerson: action.contactPerson,
@@ -364,8 +387,24 @@ import customShare from './components/custom-share/custom-share.vue';
 						cityName: action.contactAddress.split('-')[0].split(' ')[1],
 						townName: action.contactAddress.split('-')[0].split(' ')[2],
 					};
-					this.$refs['repair-form'].formData = action.repairDetailList
-				}else{
+					let repairDetailList = JSON.parse(JSON.stringify(action.repairDetailList))
+					for (var i = 0; i < repairDetailList.length; i++) {
+						if (repairDetailList[i].faultPhoto != null && repairDetailList[i].faultPhoto != "[]" && !Array
+							.isArray(repairDetailList[i].faultPhoto)) {
+							repairDetailList[i].faultPhoto = JSON.parse(repairDetailList[i].faultPhoto)
+						} else {
+							repairDetailList[i].faultPhoto = []
+						}
+						if (repairDetailList[i].voucher != null && repairDetailList[i].voucher != "[]" && !Array.isArray(
+								repairDetailList[i].voucher)) {
+							repairDetailList[i].voucher = JSON.parse(repairDetailList[i].voucher)
+						} else {
+							repairDetailList[i].voucher = []
+						}
+					}
+					this.$refs['repair-form'].formData = repairDetailList
+					this.$refs['repair-form'].currentPage = 0
+				} else {
 					this.$refs['repair-form'].contactData = {
 						repairOrder: '',
 						contactPerson: '',
@@ -409,7 +448,7 @@ import customShare from './components/custom-share/custom-share.vue';
 							that.$api('afterSale.productionMessage', {
 								productBarcode: res.result
 							}).then(reso => {
-								if (reso.flag && reso.data !=null) {
+								if (reso.flag && reso.data != null) {
 									let obj = {}
 									obj.name = reso.data.productName;
 									obj.model = reso.data.productModel;
@@ -418,7 +457,7 @@ import customShare from './components/custom-share/custom-share.vue';
 										that.$refs['repair-form'].scanBarcode(obj);
 										that.$refs['repair-form'].codeBarcode = reso.data;
 									})
-								}else{
+								} else {
 									uni.showToast({
 										icon: 'none',
 										title: '搜索不到产品信息',

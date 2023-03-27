@@ -13,11 +13,11 @@
 			<view class="input-box flex">
 				<text class="input-label">购买日期</text>
 				<view class="flex-sub flex align-center">
-					<picker mode="date" :value="searchData.productStartBuyDate" @change="bindMaxDateChange">
+					<uni-datetime-picker v-model="range" type="daterange" @maskClick="maskClick" />
+					<!-- <picker mode="date" :value="searchData.productStartBuyDate" @change="bindMaxDateChange">
 						<view class="flex align-center">
 							<input type="text" disabled v-model="searchData.productStartBuyDate" class="flex-sub"
 								placeholder="开始日期" />
-							<!-- <text v-if="maxDate" class="text-clear text-blue">清空</text> -->
 							<text v-if="searchData.productStartBuyDate" class="text-clear cuIcon-backdelete"
 								@click.stop="handleSearchClear('searchData.productStartBuyDate')"></text>
 						</view>
@@ -26,11 +26,10 @@
 						<view class="flex align-center">
 							<input type="text" disabled v-model="searchData.productEndBuyDate" class="flex-sub"
 								placeholder="结束日期" />
-							<!-- <text v-if="minDate" class="text-clear text-blue">清空</text> -->
 							<text v-if="searchData.productEndBuyDate" class="text-clear cuIcon-backdelete"
 								@click.stop="handleSearchClear('searchData.productEndBuyDate')"></text>
 						</view>
-					</picker>
+					</picker> -->
 				</view>
 			</view>
 			<view class="input-box text-blue text-center"
@@ -108,20 +107,22 @@
 		API_URL
 	} from '@/env'
 	import uniFilePicker from './components/uni-file-picker/uni-file-picker.vue';
+	import uniDatetimePicker from './components/uni-datetime-picker/uni-datetime-picker.vue';
 	export default {
 		components: {
-			registerForm,customShare,uniFilePicker
+			registerForm,customShare,uniFilePicker,uniDatetimePicker
 		},
 		data() {
 			return {
+				range: [Date.now() - 1000000000, Date.now() + 1000000000],
 				// 查找的数据集
 				searchData: {
 					// 产品条码
 					productCode: '',
 					// 购买日期-最大日期
-					productStartBuyDate: null,
+					productStartBuyDate: Date.now() - 1000000000,
 					// 购买日期-最小日期
-					productEndBuyDate: null
+					productEndBuyDate: Date.now() + 1000000000
 				},
 				imageUrl: [{
 					path: "https://yb.gzfzdev.com/uploadFiles/image/1644891542075.jpg",
@@ -141,11 +142,19 @@
 				return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
 			}
 		},
-		watch: {},
+		watch: {
+			range(newval) {
+				this.searchData.startDate = newval[0];
+				this.searchData.endDate = newval[1];
+			},
+		},
 		mounted() {
 
 		},
 		methods: {
+			maskClick(e) {
+				console.log('maskClick事件:', e);
+			},
 			ViewImage(e, item) {
 				console.log(e.currentTarget.dataset.url)
 				uni.previewImage({

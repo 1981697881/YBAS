@@ -64,17 +64,19 @@
 				<input-box label="产品名称" required><input type="text" v-model="item.productName" /></input-box>
 				<input-box label="产品型号" required><input type="text" v-model="item.productModel" /></input-box>
 				<input-box label="购买日期" required>
-					<picker mode="date" v-model="item.productBuyDate" @change="handleBounghtDateChange($event,item)">
+					<uni-datetime-picker type="date" :clear-icon="false" :value="item.productBuyDate" @change="handleBounghtDateChange($event,item)" @maskClick="maskClick" />
+					<!-- <picker mode="date" v-model="item.productBuyDate" @change="handleBounghtDateChange($event,item)">
 						<view class="flex align-center"><input type="text" disabled v-model="item.productBuyDate"
 								class="flex-sub" placeholder="请选择日期" /></view>
-					</picker>
+					</picker> -->
 				</input-box>
 				<input-box label="保修期至">
-					<picker mode="date" :disabled="isScanCode" v-model="item.productGuarantee"
+					<uni-datetime-picker type="date" :disabled="isScanCode" :clear-icon="false" :value="item.productGuarantee" @change="handleProductGuarantee($event,item)" @maskClick="maskClick" />
+					<!-- <picker mode="date" :disabled="isScanCode" v-model="item.productGuarantee"
 						@change="handleProductGuarantee($event,item)">
 						<view class="flex align-center"><input type="text" disabled v-model="item.productGuarantee"
 								class="flex-sub" placeholder="请选择日期" /></view>
-					</picker>
+					</picker> -->
 					<!-- <input type="text" v-model="item.productGuarantee" class="flex-sub"
 						:disabled="isScanCode" placeholder="自动计算,最少一年" /> -->
 				</input-box>
@@ -91,15 +93,22 @@
 				</input-box>
 				<!-- 支持多选 -->
 				<input-box label="故障图片" v-if="currentPage == index">
-					<uni-file-picker :auto-upload="false" v-model="item.faultPhoto" :limit="3" file-mediatype="image"
+					<uni-file-picker :auto-upload="false" :value="item.faultPhoto" :limit="3" file-mediatype="image"
 						mode="grid" file-extname="png,jpg" @select="select($event, 'fault',item)"
 						@delete="delFile($event, 'fault',item)" />
 				</input-box>
 				<!-- 支持多选 -->
 				<input-box label="购买凭证" v-if="currentPage == index">
-					<uni-file-picker :auto-upload="false" v-model="item.voucher" :limit="3" file-mediatype="image"
+					<uni-file-picker :auto-upload="false" :value="item.voucher" :limit="3" file-mediatype="image"
 						mode="grid" file-extname="png,jpg" @select="select($event, 'certificate',item)"
 						@delete="delFile($event, 'certificate',item)" />
+				</input-box>
+				<input-box label="反馈故障"  v-if="currentPage == index">
+					<view style="display: flex;" v-if="item.faultPhotoByE != null">
+						<view v-for="(itemImg,indexImg) in item.faultPhotoByE.split(',')" :key="index" >
+							<image style="width: 160rpx;height: 160rpx;" mode="scaleToFill" :src="itemImg"  @click="previewImage(indexImg,item.faultPhotoByE.split(','))"></image>
+						</view>
+					</view>
 				</input-box>
 				<button v-if="currentPage == index" class="cu-btn round line-red shadow"
 					@tap="delItem(index,item)">移除当前行</button>
@@ -119,10 +128,12 @@
 	import mock from '@/common/mock/register';
 	import uniFilePicker from './uni-file-picker/uni-file-picker.vue';
 	import lotusAddress from "@/components/Winglau14-lotusAddress/Winglau14-lotusAddress.vue";
+	import uniDatetimePicker from './uni-datetime-picker/uni-datetime-picker.vue';
 	export default {
 		components: {
 			"lotus-address":lotusAddress,
-			"uni-file-picker":uniFilePicker
+			"uni-file-picker":uniFilePicker,
+			"uni-datetime-picker":uniDatetimePicker
 		},
 		data() {
 			return {
@@ -154,7 +165,8 @@
 					faultDescription: '',
 					salesRequirements: 0,
 					faultPhoto: [],
-					voucher: []
+					voucher: [],
+					faultPhotoByE: ''
 				},
 				isScanCode: true,
 				codeBarcode: {},
@@ -229,6 +241,18 @@
 			               this.contactData.province = `${res.province} ${res.city} ${res.town}`; //region为已选的省市区的值
 			           }
 			       },
+				   // 多张 图片预览 
+				   previewImage(index,items) { // index 索引 如果 需要复用方法 可以使用 类型来进行区分(val)
+				   		var photoList = items.map(item => {
+				   			return item;
+				   		});
+				   	uni.previewImage({
+				   		current: index,     // 当前显示图片的索引值
+				   		urls: photoList,    // 需要预览的图片列表，photoList要求必须是数组
+				   		loop:true,          // 是否可循环预览
+				   	})
+				   },
+
 			onchange(e) {
 				let str = "";
 				console.log(e)
@@ -384,7 +408,6 @@
 						}
 					});
 				});
-				console.log(val)
 			},
 			// 文件从列表移除时触发
 			delFile(e, action, val) {
@@ -392,13 +415,14 @@
 				const {
 					url
 				} = e.tempFile;
+				console.log(e.tempFile)
 				// 需要操作的目标对象
 				if (action === 'fault') {
 					// 故障图片
 					let actionData = val.faultPhoto;
 					for (let i = 0; i < actionData.length; i++) {
 						// 删除对应的file
-						if (actionData[i].uuid === uuid) {
+						if (actionData[i].uuid === e.tempFile.uuid) {
 							actionData.splice(i, 1);
 							return;
 						}
@@ -408,7 +432,7 @@
 					let actionData = val.voucher;
 					for (let i = 0; i < actionData.length; i++) {
 						// 删除对应的file
-						if (actionData[i].uuid === url) {
+						if (actionData[i].uuid === e.tempFile.uuid) {
 							actionData.splice(i, 1);
 							return;
 						}
@@ -449,9 +473,9 @@
 				let that = this;
 				if (Object.keys(that.codeBarcode).length > 0) {
 					if (that.codeBarcode.itemOfService) {
-						item.productBuyDate = e.target.value;
+						item.productBuyDate = e;
 						// TODO 其实只需要在getFullYear的基础上+1就好了 *.*
-						const nowTime = new Date(e.target.value).getTime();
+						const nowTime = new Date(e).getTime();
 						// 时间加1年（365天）的毫秒数
 						const newTime = nowTime;
 						const newDate = new Date(newTime);
@@ -468,7 +492,7 @@
 						});
 					}
 				} else {
-					item.productBuyDate = e.target.value;
+					item.productBuyDate = e;
 					that.isScanCode = false
 					/* uni.showToast({
 						icon: 'none',
@@ -478,7 +502,7 @@
 			}, // 保修日期选择器
 			handleProductGuarantee: function(e, item) {
 				let that = this;
-				item.productGuarantee = e.target.value;
+				item.productGuarantee = e;
 			},
 		}
 	};
