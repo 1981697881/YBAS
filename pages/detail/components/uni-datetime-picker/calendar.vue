@@ -4,18 +4,17 @@
 			@click="clean"></view>
 		<view v-if="insert || show" class="uni-calendar__content"
 			:class="{'uni-calendar--fixed':!insert,'uni-calendar--ani-show':aniMaskShow}">
-
 			<view class="uni-calendar__header">
 				<view v-if="left" class="uni-calendar__header-btn-box" @click.stop="pre">
 					<view class="uni-calendar__header-btn uni-calendar--left"></view>
 				</view>
-				<picker mode="date" :value="date" fields="month" @change="bindDateChange">
+				<picker class="picker" mode="date" :value="date" fields="month" @change="bindDateChange">
 					<text class="uni-calendar__header-text">{{ (nowDate.year||'') +' / '+( nowDate.month||'')}}</text>
 				</picker>
 				<view v-if="right" class="uni-calendar__header-btn-box" @click.stop="next">
 					<view class="uni-calendar__header-btn uni-calendar--right"></view>
 				</view>
-				<!-- <text class="uni-calendar__backtoday" @click="backtoday">回到今天</text> -->
+				<text class="uni-calendar__backtoday" @click="backtoday">回到今天</text>
 
 			</view>
 			<view class="uni-calendar__box">
@@ -608,9 +607,8 @@
 		background-color: $uni-bg-color-mask;
 		transition-property: opacity;
 		transition-duration: 0.3s;
-		opacity: 0;
 		/* #ifndef APP-NVUE */
-		z-index: 99;
+		z-index: 9998;
 		/* #endif */
 	}
 
@@ -627,7 +625,7 @@
 		transition-duration: 0.3s;
 		transform: translateY(460px);
 		/* #ifndef APP-NVUE */
-		z-index: 99;
+		z-index: 9999;
 		/* #endif */
 	}
 

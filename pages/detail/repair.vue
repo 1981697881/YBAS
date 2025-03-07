@@ -182,7 +182,8 @@
 				// 查找的列表数据
 				list: [],
 				// 登记界面弹出层
-				shareStatus: false
+				shareStatus: false,
+				isSubmin: false,
 				// 登记界面是否可编辑
 			};
 		},
@@ -238,6 +239,14 @@
 			// 登记界面的表单提交
 			submit() {
 				let that = this;
+				if(that.isSubmin){
+					uni.showToast({
+						icon: 'none',
+						title: "数据还在处理，请稍后~",
+					});
+					return;
+				}
+				that.isSubmin = true;
 				// 获取表单data，rules
 				const {
 					formData,
@@ -274,10 +283,12 @@
 					}
 				}
 				contactData.contactAddress = contactData.province + '-' + contactData.contactAddress
-				contactData.repairDetail = formDataTik;
+				contactData.repairDetailList = formDataTik;
+				//contactData.repairDetail = formDataTik;
 				if (contactData.repairOrder != '') {
 					that.$api('afterSale.repairDetailUpdate', contactData).then(res => {
 						if (res.flag) {
+							that.isSubmin = false;
 							uni.showToast({
 								icon: 'none',
 								title: res.msg,
@@ -309,6 +320,7 @@
 								}
 							})
 						} else {
+							that.isSubmin = false;
 							uni.showToast({
 								icon: 'none',
 								title: res.msg,
@@ -318,6 +330,7 @@
 				} else {
 					that.$api('afterSale.repairDetailAdd', contactData).then(res => {
 						if (res.flag) {
+							that.isSubmin = false;
 							showToast(res.msg);
 							that.shareStatus = false;
 							that.getList();
@@ -345,6 +358,12 @@
 									console.log(err)
 								}
 							})
+						} else {
+							that.isSubmin = false;
+							uni.showToast({
+								icon: 'none',
+								title: res.msg,
+							});
 						}
 					});
 				}

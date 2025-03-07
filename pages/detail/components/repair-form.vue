@@ -39,7 +39,10 @@
 				<!-- <textarea v-model="contactData.contactAddr" placeholder="请填写邮寄地址" /> -->
 			</input-box>
 			<input-box label="快递单号">
-				<input type="text" v-model="contactData.courierNumber" />
+				<view class="flex align-center">
+					<input class="flex-sub" type="text" v-model="contactData.courierNumber" />
+					<uni-icons type="scan" size="20" color="#808080" @tap="handleScanExpress"></uni-icons>
+				</view>
 				<!-- <textarea v-model="contactData.contactAddr" placeholder="请填写邮寄地址" /> -->
 			</input-box>
 		</view>
@@ -63,7 +66,7 @@
 				</input-box>
 				<input-box label="产品名称" required><input type="text" v-model="item.productName" /></input-box>
 				<input-box label="产品型号" required><input type="text" v-model="item.productModel" /></input-box>
-				<input-box label="购买日期" required>
+				<input-box label="出货日期" ><!-- required -->
 					<uni-datetime-picker type="date" :clear-icon="false" :value="item.productBuyDate" @change="handleBounghtDateChange($event,item)" @maskClick="maskClick" />
 					<!-- <picker mode="date" v-model="item.productBuyDate" @change="handleBounghtDateChange($event,item)">
 						<view class="flex align-center"><input type="text" disabled v-model="item.productBuyDate"
@@ -93,8 +96,8 @@
 				</input-box>
 				<!-- 支持多选 -->
 				<input-box label="故障图片" v-if="currentPage == index">
-					<uni-file-picker :auto-upload="false" :value="item.faultPhoto" :limit="3" file-mediatype="image"
-						mode="grid" file-extname="png,jpg" @select="select($event, 'fault',item)"
+					<uni-file-picker :auto-upload="false" :value="item.faultPhoto" :limit="3" file-mediatype="image,video"
+						mode="grid" file-extname="png,jpg,mp4" @select="select($event, 'fault',item)"
 						@delete="delFile($event, 'fault',item)" />
 				</input-box>
 				<!-- 支持多选 -->
@@ -173,13 +176,13 @@
 				// 当前页码数
 				currentPage: 0,
 				// 售后要求选择器数据
-				afterSalesList: ['维修', '退换'],
+				afterSalesList: ['维修', '退换', '不修'],
 				// 必填项目，对应formData的字段，只需要写“验证提示内容”皆可
 				formRules: {
 					productCode: '产品条码不能为空',
 					productName: '产品名称不能为空',
 					productModel: '产品型号不能为空',
-					productBuyDate: '请选择购买日期'
+					/* productBuyDate: '请选择出货日期' */
 				}
 			};
 		},
@@ -193,7 +196,7 @@
 			}
 		},
 		watch: {
-			// 购买日期选择后，自动填写上保修期的时间，默认没从条码带出来的话，为1年
+			// 出货日期选择后，自动填写上保修期的时间，默认没从条码带出来的话，为1年
 			'proData.bounghtDate'(value) {
 				if (!value) return
 				// TODO 其实只需要在getFullYear的基础上+1就好了 *.*
@@ -280,8 +283,14 @@
 						that.codeBarcode = reso.data;
 						item.productName = reso.data.productName;
 						item.productModel = reso.data.productModel;
-						item.productBuyDate = '';
-						item.productGuarantee = '';
+						item.productBuyDate = reso.data.productOutputDate;
+						if(reso.data.productOutputDate == null){
+							return
+						}
+						// TODO 其实只需要在getFullYear的基础上+1就好了 *.*						const nowTime = new Date(reso.data.productOutputDate).getTime();						// 时间加1年（365天）的毫秒数						const newTime = nowTime;						const newDate = new Date(newTime);
+						newDate.setMonth(newDate.getMonth() + Number(that.codeBarcode.itemOfService));						const year = newDate.getFullYear(),							month = newDate.getMonth() + 1,							day = newDate.getDate();
+						item.productGuarantee =`${year}-${month.toString().length == 1 ? '0' : ''}${month}-${day.toString().length == 1 ? '0' : ''}${day}`;
+					
 					} else {
 						that.codeBarcode = {};
 						item.productName = '';
@@ -321,6 +330,14 @@
 						let resData = res.result.split(';')
 						item.productCode = res.result;
 						that.confirmBarcode(item);
+					}
+				});
+			},
+			handleScanExpress() {
+				let that = this
+				uni.scanCode({
+					success: function(res) {
+						that.contactData.courierNumber = res.result
 					}
 				});
 			},
@@ -468,7 +485,7 @@
 			handleAfterSales: function(e, item) {
 				item.salesRequirements = e.target.value;
 			},
-			// 购买日期选择器
+			// 出货日期选择器
 			handleBounghtDateChange: function(e, item) {
 				let that = this;
 				if (Object.keys(that.codeBarcode).length > 0) {
@@ -515,8 +532,7 @@
 
 	.form-warpper {
 		overflow-y: scroll;
-		height: 530rpx;
-		max-height: 300px;
+		height: auto;
 	}
 
 	.pagination-warpper {

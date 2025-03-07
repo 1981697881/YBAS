@@ -33,8 +33,8 @@
 					<input-box label="规格型号">
 						<text>{{ item.productModel }}</text>
 					</input-box>
-					<input-box label="客户编码">
-						<text>{{ item.custNumber }}</text>
+					<input-box label="客户">
+						<text>{{item.custName}}( {{ item.custNumber || '' }} )</text>
 					</input-box>
 					<input-box label="出库单号">
 						<text>{{ item.outPutOrderNumber }}</text>
@@ -64,7 +64,7 @@
 		computed: {},
 		watch: {},
 		mounted() {
-
+			
 		},
 		methods: {
 			// 点击扫描图标

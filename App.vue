@@ -233,4 +233,5 @@ uni-checkbox .uni-checkbox-input.uni-checkbox-input-checked{
 button{
 	font-size: inherit !important;
 }
+
 </style>

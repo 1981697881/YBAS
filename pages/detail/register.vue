@@ -89,7 +89,7 @@
 		<!-- 登记界面的弹出层start -->
 		<custom-share :show="shareStatus" title="新增登记" @close="handleShare" @rtClick="handleScan('edit')">
 			<template slot="footer">
-				<view class="share-footer bg-blue" style="height: 90rpx;" @click="submit">提交</view>
+				<view class="share-footer bg-blue" style="height: 90rpx;" :disabled="subDis" @click="submit">提交</view>
 			</template>
 			<template slot="title-right">
 				<uni-icons type="scan" color="#808080" size="28"></uni-icons>
@@ -131,7 +131,8 @@
 				// 查找的列表数据
 				list: [],
 				// 登记界面弹出层
-				shareStatus: false
+				shareStatus: false,
+				subDis: false
 				// 登记界面是否可编辑
 			};
 		},
@@ -178,6 +179,7 @@
 					formData,
 					formRules
 				} = this.$refs['register-form'];
+				this.subDis = true;
 				const showToast = function(value) {
 					uni.showToast({
 						title: value,
@@ -206,8 +208,10 @@
 					if (res.flag) {
 						that.getList();
 						showToast(res.msg);
+						that.subDis = false;
 					}else{
 						showToast(res.msg);
+						that.subDis = false;
 					}
 				});
 
